@@ -5,7 +5,9 @@ import java.util.Scanner;
 
 public class Book
 {
-    private static final String csvFormat= "title,author,genre,year";
+    private static final String csvHeader = "title,author,genre,year";
+    private static File dsFile;
+    private static int dsCurrentLine;
     private String title;
     private String author;
     private String genre;
@@ -21,6 +23,8 @@ public class Book
 
 
     }
+
+
 
     public static void serialize(Book book, File file)
     {
@@ -51,7 +55,7 @@ public class Book
         try{
             Scanner scnr = new Scanner(file);
             FileWriter fw = null;
-            if(file.length() == 0 || !(scnr.nextLine()).equals(Book.csvFormat) ){
+            if(file.length() == 0 || !(scnr.nextLine()).equals(Book.csvHeader) ) {
                 scnr.close();
                 fw = new FileWriter(file);
                 fw.write("title,author,genre,year\n");
@@ -74,9 +78,50 @@ public class Book
 
     public static Book deserialize(File file)
     {
+        if(dsFile == null || !file.getAbsolutePath().equals(dsFile.getAbsolutePath()))
+        {
+            if(!(file.exists() && file.isFile() && file.getName().endsWith(".csv") && file.length() != 0)) {
+                System.out.printf("File \"%10s\" is invalid to deserialize\n", file.getName());
+                return null;
+            }
+            dsFile = file;
+            dsCurrentLine = 1;
+        }
 
-        //deserialize into a Book obj
-        return null;
+        try(Scanner scnr = new Scanner(file)){
+            int i = 0;
+
+            //at least has 1(header)
+            while(scnr.hasNextLine() && i<dsCurrentLine){
+                scnr.nextLine();
+                i++;
+            }
+
+            if(scnr.hasNextLine()) {
+                String line = scnr.nextLine();
+                String[] bookStats = line.split(",");
+                dsCurrentLine++;
+                if(bookStats.length == 4) {
+                    return new Book(bookStats[0], bookStats[1], bookStats[2], Integer.parseInt(bookStats[3]));
+                }
+                else {
+                    System.out.printf("Corrupted entry within \"%10s\"\n",file.getName());
+                    return null;
+                }
+            }
+            else{
+                System.out.println("No data found");
+                return null;
+            }
+
+
+        }
+        catch(FileNotFoundException e) {
+            System.out.println("Error accessing file");
+            return null;
+        }
+
+
     }
 
 
