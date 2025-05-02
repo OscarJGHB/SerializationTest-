@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Book
 {
-    private static String csvFormat= "title,author,genre,year";;
+    private static final String csvFormat= "title,author,genre,year";
     private String title;
     private String author;
     private String genre;
@@ -51,7 +51,6 @@ public class Book
         try{
             Scanner scnr = new Scanner(file);
             FileWriter fw = null;
-
             if(file.length() == 0 || !(scnr.nextLine()).equals(Book.csvFormat) ){
                 scnr.close();
                 fw = new FileWriter(file);
@@ -75,6 +74,7 @@ public class Book
 
     public static Book deserialize(File file)
     {
+
         //deserialize into a Book obj
         return null;
     }
