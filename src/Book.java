@@ -48,30 +48,26 @@ public class Book
 
         }
         catch(IOException e) {
+
             System.out.println("Error creating file");
+            return;
         }
 
 
-        try{
-            Scanner scnr = new Scanner(file);
-            FileWriter fw = null;
-            if(file.length() == 0 || !(scnr.nextLine()).equals(Book.csvHeader) ) {
-                scnr.close();
-                fw = new FileWriter(file);
-                fw.write("title,author,genre,year\n");
-            }
-            else {
-                fw = new FileWriter(file, true);
-            }
+        try(Scanner scnr = new Scanner(file)){
+            boolean emptyOrInvalid = (file.length() == 0 || !(scnr.hasNextLine() && scnr.nextLine().equals(Book.csvHeader)));
+            try(FileWriter fw = new FileWriter(file, !emptyOrInvalid))
+            {
+                if(emptyOrInvalid)
+                {
+                    fw.write(csvHeader + "\n");
+                }
+                fw.write(book.title + "," + book.author + "," + book.genre + "," + book.year + "\n");
 
-            fw.write(book.title + "," + book.author + "," + book.genre + "," + book.year + "\n");
-            fw.close();
+            }
         }
         catch(IOException e) {
             System.out.println("Error accessing file");
-        }
-        catch(NullPointerException e){
-            System.out.println("Error writing to file");
         }
 
     }
