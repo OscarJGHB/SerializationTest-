@@ -1,13 +1,25 @@
 package org.Book;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 
 public class Main {
     public static void main(String[] args) {
-        Book doawk = new Book("Diary of a Wimpy Kid", "Greg Heffley", "Humor", 2017);
-        File books = new File("books.csv");
-        Book.serialize(doawk, books);
-        Book doawk2 = Book.deserialize(books);
+
+        File file = new File("Library.xml");
+        Book doawk = new Book("Diary of a Wimpy Kid: Long Haul", "Greg Heffley", "Humor", 2020);
+        Book doawk1 = new Book("Diary of a Wimpy Kid: Dog Days", "Greg Heffley", "Humor", 2017);
+        Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022);
+        LibraryIO.serializeToXML(new ArrayList<Book>(List.of(doawk1,doawk,tkamb,doawk1)),file);
+
+
+//           Book tjck = new Book("TKCS", "Greg Heffley", "Humor", 2017);
+//        Book.serializeToXML(tjck, file);
+        Collection<Book> someBooks = LibraryIO.deserializeFromXML(file);
+        someBooks.forEach(System.out::println);
 
 
 

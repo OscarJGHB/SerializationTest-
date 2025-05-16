@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "org.example"
+group = "org.Book"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -16,6 +16,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    implementation("com.thoughtworks.xstream:xstream:1.4.21")
 }
 
 tasks.test {

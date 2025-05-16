@@ -2,7 +2,6 @@ package org.Book;
 
 import org.junit.jupiter.api.Test;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookTest {
+
     File makeNewFile(String csvName){
         File file = new File(csvName);
         if(file.exists()){
@@ -40,7 +40,7 @@ public class BookTest {
     void testingSerialization() {
         File file = makeNewFile("books.csv");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
-        Book.serialize(mb, file);
+        LibraryIO.serializeToCSV(mb, file);
         List<String> csvEntries;
         try {
             csvEntries = Files.readAllLines(file.toPath());
@@ -49,7 +49,7 @@ public class BookTest {
             System.out.println("Something went wrong when reading the file, aborting test");
             return;
         }
-        assertEquals(Book.getFormat(), csvEntries.get(0));
+        assertEquals(LibraryIO.getCSVHeader(), csvEntries.get(0));
         assertEquals("To Kill a MockingBird,Harper Lee,Thriller,1960", csvEntries.get(1));
         file.delete();
     }
@@ -59,45 +59,45 @@ public class BookTest {
     void testDeserialization() {
         File file = makeNewFile("books.csv");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
-        Book.serialize(mb, file);
-        Book mbCpy = Book.deserialize(file);
+        LibraryIO.serializeToCSV(mb, file);
+        Book mbCpy = LibraryIO.deserializeFromCSV(file);
         assertTrue(mb.equals(mbCpy));
         file.delete();
     }
 
     //nothing should be added to file
     @Test
-    void badFileNameToSerialize(){
+    void badFileNameToSerializeToCSV(){
         File file = makeNewFile("books.cst");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
-        Book.serialize(mb, file);
+        LibraryIO.serializeToCSV(mb, file);
         assertEquals(0, file.length());
     }
 
     @Test
-    void giveCSVDirectoryNameToSerialize(){
+    void giveCSVDirectoryNameToSerializeToCSV(){
         File file = makeNewFile("books.csv");
         file.mkdir();
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
-        Book.serialize(mb, file);
+        LibraryIO.serializeToCSV(mb, file);
         file.delete();
     }
 
     @Test
-    void deserializeFromInvalidFileNames(){
+    void deserializeFromCSVFromInvalidFileNames(){
 
         //Nonexistent File
         File nonExistentFile = makeNewFile("books.csv");
-        assertEquals(null, Book.deserialize(nonExistentFile));
+        assertEquals(null, LibraryIO.deserializeFromCSV(nonExistentFile));
 
         //Directory
         File dir = makeNewFile("books");
         dir.mkdir();
-        assertEquals(null,Book.deserialize(dir));
+        assertEquals(null, LibraryIO.deserializeFromCSV(dir));
 
         //wrong file extension
         File invFileExt = makeNewFile("books.txt");
-        assertEquals(null,Book.deserialize(invFileExt));
+        assertEquals(null, LibraryIO.deserializeFromCSV(invFileExt));
 
         nonExistentFile.delete();
         dir.delete();
@@ -106,7 +106,7 @@ public class BookTest {
     }
 
     @Test
-    void deserializeWithInvalidHeader(){
+    void deserializeFromCSVWithInvalidHeader(){
         File exampleCSV = makeNewFile("books.csv");
         try(FileWriter fw = new FileWriter(exampleCSV)){
             fw.write("Author,Genre,Year,Title"+"\n");
@@ -116,14 +116,14 @@ public class BookTest {
             System.out.println("Something went wrong when writing to the file, aborting test");
         }
 
-        assertEquals(null,Book.deserialize(exampleCSV));
+        assertEquals(null, LibraryIO.deserializeFromCSV(exampleCSV));
         exampleCSV.delete();
 
 
     }
 
     @Test
-    void deserializeWithInvalidEntries(){
+    void deserializeFromCSVWithInvalidEntries(){
         File exampleCSV = makeNewFile("books.csv");
 
         //invalid year
@@ -131,7 +131,7 @@ public class BookTest {
             fw.write("title,author,genre,year"+"\n");
             fw.write("Jane Austen,Romance Novel,1891,Pride and Prejudice"+"\n");
             fw.flush();
-            assertNull(Book.deserialize(exampleCSV));
+            assertNull(LibraryIO.deserializeFromCSV(exampleCSV));
         }
         catch(IOException e){
             System.out.println("Something went wrong when writing to the file, aborting test");
@@ -143,7 +143,7 @@ public class BookTest {
             fw.write("title,author,genre,year"+"\n");
             fw.write("Pride and Prejudice, Jane Austen, Romance Novel"+"\n");
             fw.flush();
-            assertNull(Book.deserialize(exampleCSV));
+            assertNull(LibraryIO.deserializeFromCSV(exampleCSV));
         }
         catch(IOException e){
             System.out.println("Something went wrong when writing to the file, aborting test");
@@ -154,7 +154,7 @@ public class BookTest {
             //erase file and restart
             fw.write("title,author,genre,year"+"\n");
             fw.flush();
-            assertNull(Book.deserialize(exampleCSV));
+            assertNull(LibraryIO.deserializeFromCSV(exampleCSV));
         }
         catch(IOException e){
             System.out.println("Something went wrong when writing to the file, aborting test");
@@ -166,7 +166,21 @@ public class BookTest {
     }
 
 
+    @Test
+    void testFileForSerialization() {
+        File file = makeNewFile("Books.csv");
+        assertTrue(LibraryIO.testFileForSerialization(file, ".csv"));
+        assertFalse(LibraryIO.testFileForSerialization(file, ".txt"));
+        file.delete();
 
+        file = makeNewFile("Book.xml");
+        assertTrue(LibraryIO.testFileForSerialization(file, ".xml"));
+        assertFalse(LibraryIO.testFileForSerialization(file, ".txt"));
+        file.delete();
 
-
+        file = makeNewFile("Book");
+        assertFalse(LibraryIO.testFileForSerialization(file, ".csv"));
+        assertFalse(LibraryIO.testFileForSerialization(file, ".txt"));
+        file.delete();
+    }
 }
