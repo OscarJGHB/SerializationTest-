@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.util.*;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.io.StreamException;
 
@@ -24,12 +23,12 @@ public class LibraryIO
     private static XStream setUpXstream(){
         XStream xstream = new XStream();
         xstream.alias("Book", Book.class);
-        xstream.alias("Library", HashSet.class);
+        xstream.alias("Library", Set.class);
         xstream.allowTypes(new Class[] { Book.class });
         return xstream;
     }
 
-    //returns true if file is valid
+    //returns true if file is a file/created
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean testFileForSerialization(File file, String fileExt){
         String fileName = file.getName().trim().toLowerCase();
@@ -68,32 +67,38 @@ public class LibraryIO
         }
         return true;
     }
-
-    public static void serializeToXML(Book book, File file) {serializeToXML(new HashSet<>(Set.of(book)), file);}
+    public static void serializeToXML(Book book, File file) {serializeToXML(new HashSet<>(Set.of(book)), file, false);}
 
     //TODO: Implement binary outputstream
-    //TODO: avoid always overwriting
+    //TODO: always overwrite but pass into ObjectOutput for all obj
     @SuppressWarnings("unchecked")
-    public static void serializeToXML(Collection<Book> listOfBooks, File file) {
+    public static void serializeToXML(Collection<Book> listOfBooks, File file, boolean overwrite) {
         if(listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".xml")){
             return;
         }
-        HashSet<Book> listOfBooksFromFile;
-        try (FileInputStream fis = new FileInputStream(file)){
-            Object obj = xstream.fromXML(fis);
-            if(obj instanceof HashSet && ((HashSet<?>)obj).stream().allMatch(o -> o instanceof LibraryIO)){
-                    listOfBooksFromFile = (HashSet<Book>)obj;
-            }
-            else{
-                listOfBooksFromFile = new HashSet<>();
-            }
-            if(!listOfBooksFromFile.addAll(listOfBooks)){
-                System.out.println("Duplicate found- not adding");
-                return;
+
+
+        HashSet<Object> listOfBooksFromFile = new HashSet<>();
+        try(ObjectInputStream ois = xstream.createObjectInputStream(new FileInputStream(file))){
+            while(true){
+                try{
+                    Object obj = ois.readObject();
+                    if(obj instanceof Book || !overwrite){
+                        listOfBooksFromFile.add(obj);
+                    }
+                }
+                catch(EOFException e){
+                    break;
+                }
+
             }
         }
         catch (IOException e) {
             System.out.println("Error accessing file");
+            return;
+        }
+        catch (ClassNotFoundException e) {
+            System.out.println("Error wit file no lie");
             return;
         }
         catch (NullPointerException e) {
@@ -101,21 +106,19 @@ public class LibraryIO
             return;
         }
         catch (ConversionException | StreamException e) {
-            System.out.println("File is empty or corrupted, rewriting file");
-            listOfBooksFromFile = new HashSet<Book>(listOfBooks);
+            if(overwrite){
+                System.out.println("File is empty or corrupted, rewriting file");
+                listOfBooksFromFile = new HashSet<>(listOfBooks);
+            }
+            else{
+                System.out.println("File is empty or corrupted, not overwriting file");
+                return;
+            }
+
+
         }
 
-        try (FileWriter fw = new FileWriter(file)) {
-            xstream.toXML(new HashSet<>(listOfBooksFromFile), fw);
-            fw.write("\n");
-            fw.flush();
-        }
-        catch(XStreamException e){
-            System.out.println("Books given cannot be serialized");
-        }
-        catch(IOException e) {
-            System.out.println("Error accessing file");
-        }
+        ObjectSerializer.serializeToXML(listOfBooksFromFile,xstream,"Library",file);
     }
 
     public static void serializeToCSV(Book book, File file) {
@@ -145,13 +148,13 @@ public class LibraryIO
     public static HashSet<Book> deserializeFromXML(File file) {
 
         if (!testFileForDeserialization(file,".xml")){
-            return null;
+            return new HashSet<>();
         }
 
         HashSet<Book> someBooks = new HashSet<>();
 
         try (FileInputStream fis = new FileInputStream(file)) {
-            someBooks = (HashSet<Book>) xstream.fromXML(fis);
+            someBooks = (HashSet<Book>)xstream.fromXML(fis);
         }
         catch(IOException e) {
             System.out.println("Error accessing file");

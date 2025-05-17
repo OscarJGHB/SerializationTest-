@@ -1,0 +1,29 @@
+<Root>
+  <org.Book.Book>
+    <title>Diary of a Wimpy Kid: Dog Days</title>
+    <author>Greg Heffley</author>
+    <genre>Humor</genre>
+    <year>2017</year>
+  </org.Book.Book>
+  <org.Book.Book>
+    <title>Diary of a Wimpy Kid: Long Haul</title>
+    <author>Greg Heffley</author>
+    <genre>Humor</genre>
+    <year>2020</year>
+  </org.Book.Book>
+  <org.Book.Book>
+    <title>TKAMB</title>
+    <author>DOUG</author>
+    <genre>FUNNY</genre>
+    <year>2022</year>
+  </org.Book.Book>
+  <org.Book.Book>
+    <title>Diary of a Wimpy Kid: Dog Days</title>
+    <author>Greg Heffley</author>
+    <genre>Humor</genre>
+    <year>2017</year>
+  </org.Book.Book>
+  <int>1</int>
+  <int>3</int>
+  <string>StringLing</string>
+</Root>
