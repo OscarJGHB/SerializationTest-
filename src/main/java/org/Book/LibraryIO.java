@@ -4,9 +4,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
+import com.sun.source.tree.Tree;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.io.StreamException;
+import com.thoughtworks.xstream.mapper.Mapper;
 
 public class LibraryIO
 {
@@ -67,58 +69,42 @@ public class LibraryIO
         }
         return true;
     }
-    public static void serializeToXML(Book book, File file) {serializeToXML(new HashSet<>(Set.of(book)), file, false);}
 
-    //TODO: Implement binary outputstream
-    //TODO: always overwrite but pass into ObjectOutput for all obj
     @SuppressWarnings("unchecked")
-    public static void serializeToXML(Collection<Book> listOfBooks, File file, boolean overwrite) {
-        if(listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".xml")){
+    public static void serializeToXML(Collection<Book> listOfBooks, File file, boolean bookOnly, boolean flatten) {
+        if(listOfBooks == null || listOfBooks.isEmpty() || listOfBooks.contains(null) || !testFileForSerialization(file,".xml")){
             return;
         }
 
-
-        HashSet<Object> listOfBooksFromFile = new HashSet<>();
-        try(ObjectInputStream ois = xstream.createObjectInputStream(new FileInputStream(file))){
-            while(true){
-                try{
-                    Object obj = ois.readObject();
-                    if(obj instanceof Book || !overwrite){
-                        listOfBooksFromFile.add(obj);
-                    }
-                }
-                catch(EOFException e){
-                    break;
-                }
-
-            }
+        Class<?> desiredClass = Book.class;
+        if(!bookOnly){
+            desiredClass = Object.class;
         }
-        catch (IOException e) {
-            System.out.println("Error accessing file");
+
+        Collection<Object> listOfObjFromFile = new HashSet<>();
+        try{
+            listOfObjFromFile.addAll(ObjectSerializer.deserializeObjFromXML(desiredClass,xstream, file));
+            listOfObjFromFile.addAll(listOfBooks);
+            ObjectSerializer.serializeToXML(listOfObjFromFile, xstream, flatten ? "Library" : null , file, flatten);
+        }
+        catch (IOException e){
+            System.out.println("Error serializing to file, stopping serialization");
             return;
         }
-        catch (ClassNotFoundException e) {
-            System.out.println("Error wit file no lie");
-            return;
-        }
-        catch (NullPointerException e) {
-            System.out.println("Null pointer exception");
+        catch(NullPointerException e){
+            System.out.println("Null Pointer Exception, stopping serialization");
             return;
         }
         catch (ConversionException | StreamException e) {
-            if(overwrite){
+            if(!bookOnly){
                 System.out.println("File is empty or corrupted, rewriting file");
-                listOfBooksFromFile = new HashSet<>(listOfBooks);
+                listOfObjFromFile = new HashSet<>(listOfBooks);
             }
             else{
                 System.out.println("File is empty or corrupted, not overwriting file");
                 return;
             }
-
-
         }
-
-        ObjectSerializer.serializeToXML(listOfBooksFromFile,xstream,"Library",file);
     }
 
     public static void serializeToCSV(Book book, File file) {
@@ -145,24 +131,24 @@ public class LibraryIO
     }
 
     @SuppressWarnings("unchecked")
-    public static HashSet<Book> deserializeFromXML(File file) {
+    public static TreeSet<Book> deserializeFromXML(File file) {
 
         if (!testFileForDeserialization(file,".xml")){
-            return new HashSet<>();
+            return new TreeSet<>();
         }
 
-        HashSet<Book> someBooks = new HashSet<>();
+        TreeSet<Book> treeSetOfBooks = new TreeSet<>();
 
-        try (FileInputStream fis = new FileInputStream(file)) {
-            someBooks = (HashSet<Book>)xstream.fromXML(fis);
+        try{
+            treeSetOfBooks = new TreeSet<>(ObjectSerializer.deserializeObjFromXML(Book.class, xstream, file));
         }
         catch(IOException e) {
             System.out.println("Error accessing file");
         }
         catch (ConversionException | StreamException e) {
-            System.out.println("File is corrupted, stopping deserialization");
+            System.out.println("File is corrupted, aborting deserialization and returning empty TreeSet");
         }
-        return someBooks;
+        return treeSetOfBooks;
 
     }
 

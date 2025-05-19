@@ -3,7 +3,7 @@ package org.Book;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Book implements Serializable{
+public class Book implements Serializable, Comparable<Book> {
 
     private String title;
     private String author;
@@ -38,7 +38,10 @@ public class Book implements Serializable{
         return year;
     }
 
-
+    @Override
+    public int compareTo(Book b){
+        return Integer.compare(this.hashCode(), b.hashCode());
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -50,7 +53,6 @@ public class Book implements Serializable{
         {
             return false;
         }
-
         Book book = (Book) obj;
         return (book.author.equals(this.author)
                 && book.title.equals(this.title)

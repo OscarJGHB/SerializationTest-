@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 public class Main {
@@ -19,13 +17,17 @@ public class Main {
         Book doawk = new Book("Diary of a Wimpy Kid: Long Haul", "Greg Heffley", "Humor", 2020);
         Book doawk1 = new Book("Diary of a Wimpy Kid: Dog Days", "Greg Heffley", "Humor", 2017);
         Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022);
-        LibraryIO.serializeToXML(new ArrayList<Book>(List.of(doawk1,doawk,tkamb,doawk1)),file,false);
+        Book tkamb2 = new Book("Te","D","Romance",2022);
+        Book invisible = new Book("Invisible","Rob","Novel",2013);
 
-//           Book tjck = new Book("TKCS", "Greg Heffley", "Humor", 2017);
-//        Book.serializeToXML(tjck, file);
-//        Collection<Book> someBooks = LibraryIO.deserializeFromXML(file);
-//        someBooks.forEach(System.out::println);
-        //file.delete();
+        Collection<Book> books = new ArrayList<>(Set.of(doawk, doawk1, tkamb, tkamb2));
+        LibraryIO.serializeToXML(books, file, true, false);
+
+
+        TreeSet<Book> set = LibraryIO.deserializeFromXML(file);
+        set.forEach(System.out::println);
+
+
 
 
 
