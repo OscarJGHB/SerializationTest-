@@ -3,6 +3,7 @@ package org.Book;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.io.StreamException;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
 import java.io.*;
 import java.util.Collection;
@@ -15,20 +16,20 @@ public class ObjectSerializer {
      * </li>
      *
      *
-     * @param obj  any object to be serialized... can be a collection
+     * @param obj  any object to be serialized... can be a collection(integrity determined by @param <strong>flatten</strong>
      * @param xstream  an instance of XStream with its own aliases set
      * @param rootName  String, can be custom, null, or blank
      * @param file  file to be parsed from.
-     * @param flatten if Objects given should be written individually or with the data structure they are contained in
+     * @param keepStructure if Objects given should be written individually or with the data structure they are contained in
      * @throws IOException  In the event where file cannot be read from or written to
      *
      */
-    public static void serializeToXML(Object obj, XStream xstream, String rootName, File file, boolean flatten) throws IOException {
+    public static void serializeToXML(Object obj, XStream xstream, String rootName, File file, boolean keepStructure) throws IOException {
         if (rootName == null || rootName.isEmpty()){
             rootName = "Root";
         }
         ObjectOutputStream out = xstream.createObjectOutputStream(new FileOutputStream(file),rootName);
-        if (flatten && obj instanceof Collection) {
+        if (!keepStructure && obj instanceof Collection) {
             HashSet<Object> objHashSet = new HashSet<>();
             getNonCollectionObjs(Object.class, (Collection<?>) obj, objHashSet);
             for (Object o : objHashSet) {
@@ -50,21 +51,22 @@ public class ObjectSerializer {
      *                     be set to Object
      * @param xstream  instance of xstream
      * @param file  file to be parsed from
+     * @param keepStructure if Objects given should be written individually or with the data structure they are contained in
      * @return HashSet<Object>  returns a hashSet of <strong>Object</strong> for the user to parse
      * @throws IOException  In the event where file cannot be read or written to
 
      */
-    public static <T> HashSet<T> deserializeObjFromXML(Class<T> desiredClass, XStream xstream, File file) throws IOException {
+    public static <T> HashSet<T> deserializeObjFromXML(Class<T> desiredClass, XStream xstream, File file, boolean keepStructure) throws IOException {
         HashSet<T> deserializedObjects = new HashSet<>();
         try(ObjectInputStream in = xstream.createObjectInputStream(new FileInputStream(file))) {
             while(true){
                 try{
                     Object obj = in.readObject();
-                    if(desiredClass.isInstance(obj)){
-                        deserializedObjects.add(desiredClass.cast(obj));
-                    }
-                    else if(obj instanceof Collection<?>){
+                    if(!keepStructure && obj instanceof Collection<?>){
                             getNonCollectionObjs(desiredClass, (Collection<?>) obj, deserializedObjects);
+                    }
+                    else if(desiredClass.isInstance(obj)){
+                        deserializedObjects.add(desiredClass.cast(obj));
                     }
                 }
                 catch(EOFException e){
@@ -73,12 +75,17 @@ public class ObjectSerializer {
                 catch(ConversionException | StreamException | ClassNotFoundException e){
                     //skipping unknown class
                 }
+                catch(CannotResolveClassException e){
+                    System.out.println("Object encountered in file needs to be allowed via XStream");
+                }
             }
         }
         catch (NullPointerException e) {
-            System.out.println("Null pointer exception");
+            System.out.println("Null Pointer Exception");
             return deserializedObjects;
         }
+
+
 
         return deserializedObjects;
     }

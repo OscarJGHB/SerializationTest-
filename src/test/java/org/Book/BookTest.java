@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,7 +61,7 @@ public class BookTest {
         File file = makeNewFile("books.csv");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
         LibraryIO.serializeToCSV(mb, file);
-        Book mbCpy = LibraryIO.deserializeFromCSV(file);
+        TreeSet<Book> mbCpy = LibraryIO.deserializeFromCSV(file);
         assertTrue(mb.equals(mbCpy));
         file.delete();
     }
