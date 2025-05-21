@@ -1,8 +1,11 @@
 package org.Book;
 
+import com.sun.source.tree.Tree;
+import com.thoughtworks.xstream.XStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +14,16 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookTest {
+
+    public XStream setUpXstream(){
+        XStream xstream = new XStream();
+        xstream.alias("Book", Book.class);
+        xstream.alias("Library", Set.class);
+        xstream.alias("Library", Collection.class);
+        xstream.alias("Library", TreeSet.class);
+        xstream.allowTypes(new Class[] { Book.class });
+        return xstream;
+    }
 
     File makeNewFile(String csvName){
         File file = new File(csvName);
@@ -197,7 +210,33 @@ public class BookTest {
     }
 
     @Test
-    void testManyBooksXMLFileSerializationAndDeserialization(){
+    void testManyBooksXMLFileSerialization(){
+        File file = makeNewFile("Books.xml");
+
+        Book book1 = new Book("1","2","3",4);
+        Book book2 = new Book("a","b","c",4);
+        Book book3 = new Book("T","O","M",4);
+        Book book4 = new Book("A","R","F",4);
+
+        Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
+        TreeSet<Book> booksFromXML;
+
+        LibraryIO.serializeToXML(books,file);
+
+        XStream xstream = setUpXstream();
+        try {
+            booksFromXML = new TreeSet<Book>(ObjectSerializer.deserializeObjFromXML(Book.class,xstream,file,false));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        assertEquals(books, booksFromXML, "Deserialized books do not match the original set");
+
+        file.delete();
+    }
+
+    @Test
+    void testManyBooksXMLFileDeserialization(){
         File file = makeNewFile("Books.xml");
 
         Book book1 = new Book("1","2","3",4);
@@ -207,7 +246,13 @@ public class BookTest {
 
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
 
-        LibraryIO.serializeToXML(books,file);
+        XStream xstream = setUpXstream();
+        try(FileOutputStream fos = new FileOutputStream(file)){
+            xstream.toXML(books,fos);
+        }
+        catch(IOException e){
+            throw new RuntimeException(e);
+        }
 
         TreeSet<Book> resultBooks = LibraryIO.deserializeFromXML(file);
         assertEquals(books, resultBooks, "Deserialized books do not match the original set");
