@@ -75,8 +75,8 @@ public class LibraryIO
 
     @SuppressWarnings("unchecked")
     public static void serializeToXML(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
-        if(listOfBooks == null || listOfBooks.isEmpty() || listOfBooks.contains(null) || !testFileForSerialization(file,".xml")){
-            throw new IllegalArgumentException("File unable to be serialized to-- Books passed in may not exist...");
+        if(listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".xml")){
+            throw new IllegalArgumentException("File unable to be serialized to");
         }
 
         Collection<Object> listOfObjFromFile = new HashSet<>();
@@ -109,7 +109,7 @@ public class LibraryIO
 
     public static void serializeToCSV(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
         if(listOfBooks == null || listOfBooks.isEmpty() || listOfBooks.contains(null) || !testFileForSerialization(file,".csv")){
-            throw new IllegalArgumentException("File unable to be serialized to-- Books passed in may not exist...");
+            throw new IllegalArgumentException("File unable to be serialized to");
         }
 
         TreeSet<Book> treeSetOfBooks = new TreeSet<>();
@@ -182,7 +182,7 @@ public class LibraryIO
                          treeSetOfBooks.add(new Book(bookStats[0].trim(), bookStats[1].trim(), bookStats[2].trim(), yearReleased));
                     }
                     catch(NumberFormatException e) {
-                        System.out.printf("Corrupt Entry: %s @ ln %d Skipping...",line, lineNum);
+                        //skipping
                     }
                 }
                 else {

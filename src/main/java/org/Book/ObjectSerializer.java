@@ -28,18 +28,20 @@ public class ObjectSerializer {
         if (rootName == null || rootName.isEmpty()){
             rootName = "Root";
         }
-        ObjectOutputStream out = xstream.createObjectOutputStream(new FileOutputStream(file),rootName);
-        if (!keepStructure && obj instanceof Collection) {
-            HashSet<Object> objHashSet = new HashSet<>();
-            getNonCollectionObjs(Object.class, (Collection<?>) obj, objHashSet);
-            for (Object o : objHashSet) {
-                out.writeObject(o);
+        try (FileOutputStream fos = new FileOutputStream(file);
+             ObjectOutputStream out = xstream.createObjectOutputStream(fos,rootName)){
+
+            if (!keepStructure && obj instanceof Collection) {
+                HashSet<Object> objHashSet = new HashSet<>();
+                getNonCollectionObjs(Object.class, (Collection<?>) obj, objHashSet);
+                for (Object o : objHashSet) {
+                    out.writeObject(o);
+                }
+            }
+            else{
+                out.writeObject(obj);
             }
         }
-        else{
-            out.writeObject(obj);
-        }
-        out.close();
     }
 
 
@@ -58,7 +60,9 @@ public class ObjectSerializer {
      */
     public static <T> HashSet<T> deserializeObjFromXML(Class<T> desiredClass, XStream xstream, File file, boolean keepStructure) throws IOException {
         HashSet<T> deserializedObjects = new HashSet<>();
-        try(ObjectInputStream in = xstream.createObjectInputStream(new FileInputStream(file))) {
+        try(FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream in = xstream.createObjectInputStream(fis)) {
+
             while(true){
                 try{
                     Object obj = in.readObject();
