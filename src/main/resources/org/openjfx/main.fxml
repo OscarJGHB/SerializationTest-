@@ -24,13 +24,13 @@
             </columns>
         </TableView>
         <TextField fx:id="textField0"
-            AnchorPane.leftAnchor="75"
+            AnchorPane.leftAnchor="95"
             AnchorPane.bottomAnchor="10"
         />
         <Label fx:id="label" text="Label"
                AnchorPane.rightAnchor="10"
                AnchorPane.bottomAnchor="10"/>
-        <Button fx:id="button0" text="button" onAction="#button0Task"
+        <Button fx:id="button0" text="Deserialize" onAction="#button0Task"
                 AnchorPane.bottomAnchor="10"
                 AnchorPane.leftAnchor="10"
         />
