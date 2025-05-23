@@ -1,14 +1,23 @@
 package org.Book;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.converters.basic.BooleanConverter;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@XStreamAlias("Book")
 public class Book implements Serializable, Comparable<Book> {
 
+    @XStreamAsAttribute
     private String title;
     private String author;
     private String genre;
     private int year;
+    @XStreamConverter(value = BooleanConverter.class,booleans = {true,false},strings = {"yes","no"})
+    private boolean pictures;
 
     public Book(){
         this.title = "";
@@ -16,11 +25,12 @@ public class Book implements Serializable, Comparable<Book> {
         this.genre = "";
         this.year = 0;
     }
-    public Book(String title, String author, String genre, int year) {
+    public Book(String title, String author, String genre, int year, boolean pictures) {
         this.title = title.trim();
         this.author = author.trim();
         this.genre = genre.trim();
         this.year = year;
+        this.pictures = pictures;
     }
 
     public String getTitle() {
@@ -36,6 +46,10 @@ public class Book implements Serializable, Comparable<Book> {
 
     public int getYear() {
         return year;
+    }
+
+    public boolean getPictures() {
+        return pictures;
     }
 
     @Override

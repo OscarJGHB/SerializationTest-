@@ -18,9 +18,7 @@ public class BookTest {
     public XStream setUpXstream(){
         XStream xstream = new XStream();
         xstream.alias("Book", Book.class);
-        xstream.alias("Library", Set.class);
-        xstream.alias("Library", Collection.class);
-        xstream.alias("Library", TreeSet.class);
+        xstream.autodetectAnnotations(true);
         xstream.allowTypes(new Class[] { Book.class });
         return xstream;
     }
@@ -35,15 +33,15 @@ public class BookTest {
 
     @Test
     void comparingSameBooks(){
-        Book book1 = new Book("Pride and Prejudice", "Jane Austen", "Romance Novel", 1813);
-        Book alsoBook1 = new Book("Pride and Prejudice", "Jane Austen", "Romance Novel", 1813);
+        Book book1 = new Book("Pride and Prejudice", "Jane Austen", "Romance Novel", 1813,true);
+        Book alsoBook1 = new Book("Pride and Prejudice", "Jane Austen", "Romance Novel", 1813,true);
         assertTrue(book1.equals(alsoBook1));
     }
 
     @Test
     void comparingDifferentBooks(){
-        Book book1 = new Book("Pride and Prejudice", "Jane Austen", "Romance Novel", 1813);
-        Book alsoBook1 = new Book("Pride with Prejudice", "Jane Austen", "Romance Novel", 1813);
+        Book book1 = new Book("Pride and Prejudice", "Jane Austen", "Romance Novel", 1813,true);
+        Book alsoBook1 = new Book("Pride with Prejudice", "Jane Austen", "Romance Novel", 1813,true);
         assertFalse(book1.equals(alsoBook1));
     }
 
@@ -53,7 +51,7 @@ public class BookTest {
     @Test
     void testingSerialization() {
         File file = makeNewFile("books.csv");
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
+        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         LibraryIO.serializeToCSV(mb, file);
         List<String> csvEntries;
         try {
@@ -64,7 +62,7 @@ public class BookTest {
             return;
         }
         assertEquals(LibraryIO.getCSVHeader(), csvEntries.get(0));
-        assertEquals("To Kill a MockingBird,Harper Lee,Thriller,1960", csvEntries.get(1));
+        assertEquals("To Kill a MockingBird,Harper Lee,Thriller,1960,true", csvEntries.get(1));
         file.delete();
     }
 
@@ -72,7 +70,7 @@ public class BookTest {
     @Test
     void testDeserialization() {
         File file = makeNewFile("books.csv");
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
+        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         LibraryIO.serializeToCSV(mb, file);
         TreeSet<Book> mbCpy = LibraryIO.deserializeFromCSV(file);
         assertTrue(mb.equals(mbCpy.first()));
@@ -83,7 +81,7 @@ public class BookTest {
     @Test
     void badFileNameToSerializeToCSV(){
         File file = makeNewFile("books.cst");
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
+        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         try {
             LibraryIO.serializeToCSV(mb, file);
         } catch (IllegalArgumentException e) {
@@ -95,7 +93,7 @@ public class BookTest {
     void giveCSVDirectoryNameToSerializeToCSV(){
         File file = makeNewFile("books.csv");
         file.mkdir();
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960);
+        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         try {
             LibraryIO.serializeToCSV(mb, file);
         } catch (Exception e) {
@@ -203,7 +201,7 @@ public class BookTest {
     @Test
     void testOneBookXMLFileSerialization(){
         File file = makeNewFile("Books.xml");
-        Book book1 = new Book("1","2","3",4);
+        Book book1 = new Book("1","2","3",4,true);
         LibraryIO.serializeToXML(book1,file);
         assertEquals(book1, LibraryIO.deserializeFromXML(file).first());
         file.delete();
@@ -213,10 +211,10 @@ public class BookTest {
     void testManyBooksXMLFileSerialization(){
         File file = makeNewFile("Books.xml");
 
-        Book book1 = new Book("1","2","3",4);
-        Book book2 = new Book("a","b","c",4);
-        Book book3 = new Book("T","O","M",4);
-        Book book4 = new Book("A","R","F",4);
+        Book book1 = new Book("1","2","3",4,true);
+        Book book2 = new Book("a","b","c",4,true);
+        Book book3 = new Book("T","O","M",4,true);
+        Book book4 = new Book("A","R","F",4,true);
 
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
         TreeSet<Book> booksFromXML;
@@ -239,10 +237,10 @@ public class BookTest {
     void testManyBooksXMLFileDeserialization(){
         File file = makeNewFile("Books.xml");
 
-        Book book1 = new Book("1","2","3",4);
-        Book book2 = new Book("a","b","c",4);
-        Book book3 = new Book("T","O","M",4);
-        Book book4 = new Book("A","R","F",4);
+        Book book1 = new Book("1","2","3",4,true);
+        Book book2 = new Book("a","b","c",4,true);
+        Book book3 = new Book("T","O","M",4,true);
+        Book book4 = new Book("A","R","F",4,true);
 
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
 

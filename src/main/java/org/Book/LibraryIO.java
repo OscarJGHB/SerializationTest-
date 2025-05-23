@@ -11,11 +11,9 @@ import com.thoughtworks.xstream.io.StreamException;
 
 public class LibraryIO
 {
-    private static final String csvHeader = "title,author,genre,year";
-    private static File dsFile;
-    private static int dsCurrentLine;
-    private static final XStream xstream = setUpXstream();
 
+    private static final String csvHeader = "title,author,genre,year";
+    private static final XStream xstream = setUpXstream();
 
     public static String getCSVHeader(){
         return csvHeader;
@@ -23,9 +21,9 @@ public class LibraryIO
 
     public static XStream setUpXstream(){
         XStream xstream = new XStream();
-        xstream.alias("Book", Book.class);
         xstream.alias("Library", Set.class);
         xstream.allowTypes(new Class[] { Book.class });
+        xstream.processAnnotations(Book.class);
         return xstream;
     }
 
@@ -125,7 +123,7 @@ public class LibraryIO
             fw.flush();
             treeSetOfBooks.addAll(listOfBooks);
             for(Book book : treeSetOfBooks){
-                fw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getGenre() + "," + book.getYear() + "\n");
+                fw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getGenre() + "," + book.getYear() + "," + book.getPictures()+"\n");
             }
         }
         catch(IOException e) {
@@ -175,13 +173,18 @@ public class LibraryIO
                 int lineNum = 0; //error printing purposes
                 String line = scnr.nextLine();
                 String[] bookStats = line.split(",");
-                if(bookStats.length == 4) {
+                if(bookStats.length == 5) {
                     int yearReleased;
                     try{
                          yearReleased = Integer.parseInt(bookStats[3]);
-                         treeSetOfBooks.add(new Book(bookStats[0].trim(), bookStats[1].trim(), bookStats[2].trim(), yearReleased));
+                         boolean pictures = switch (bookStats[4].trim().toLowerCase()) {
+                             case "true" -> true;
+                             case "false" -> false;
+                             default -> throw new IllegalArgumentException();
+                         };
+                        treeSetOfBooks.add(new Book(bookStats[0].trim(), bookStats[1].trim(), bookStats[2].trim(), yearReleased,pictures));
                     }
-                    catch(NumberFormatException e) {
+                    catch(IllegalArgumentException e) {
                         //skipping
                     }
                 }
