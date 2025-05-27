@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.Book.Book;
-import org.Book.LibraryIO;
 
 import java.io.File;
 
@@ -48,10 +47,10 @@ public class FXMLController {
         ObservableList<Book> books = null;
         try {
             if(fileName.endsWith(".csv")){
-                books = FXCollections.observableList(new ArrayList<>(LibraryIO.deserializeFromCSV(new File(fileName))));
+                books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromCSV(new File(fileName))));
             }
             else if(fileName.endsWith(".xml")){
-                books = FXCollections.observableList(new ArrayList<>(LibraryIO.deserializeFromXML(new File(fileName))));
+                books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromXML(new File(fileName))));
             }
             if(books == null)
                 throw new IllegalArgumentException();

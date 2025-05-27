@@ -1,8 +1,6 @@
 package org.Book;
 
-import com.sun.source.tree.Tree;
 import com.thoughtworks.xstream.XStream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,7 +50,7 @@ public class BookTest {
     void testingSerialization() {
         File file = makeNewFile("books.csv");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
-        LibraryIO.serializeToCSV(mb, file);
+        Book.serializeToCSV(mb, file);
         List<String> csvEntries;
         try {
             csvEntries = Files.readAllLines(file.toPath());
@@ -61,7 +59,7 @@ public class BookTest {
             System.out.println("Something went wrong when reading the file, aborting test");
             return;
         }
-        assertEquals(LibraryIO.getCSVHeader(), csvEntries.get(0));
+        assertEquals(Book.getCSVHeader(), csvEntries.get(0));
         assertEquals("To Kill a MockingBird,Harper Lee,Thriller,1960,true", csvEntries.get(1));
         file.delete();
     }
@@ -71,8 +69,8 @@ public class BookTest {
     void testDeserialization() {
         File file = makeNewFile("books.csv");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
-        LibraryIO.serializeToCSV(mb, file);
-        TreeSet<Book> mbCpy = LibraryIO.deserializeFromCSV(file);
+        Book.serializeToCSV(mb, file);
+        TreeSet<Book> mbCpy = Book.deserializeFromCSV(file);
         assertTrue(mb.equals(mbCpy.first()));
         file.delete();
     }
@@ -83,7 +81,7 @@ public class BookTest {
         File file = makeNewFile("books.cst");
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         try {
-            LibraryIO.serializeToCSV(mb, file);
+            Book.serializeToCSV(mb, file);
         } catch (IllegalArgumentException e) {
         }
         assertEquals(0, file.length());
@@ -95,7 +93,7 @@ public class BookTest {
         file.mkdir();
         Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         try {
-            LibraryIO.serializeToCSV(mb, file);
+            Book.serializeToCSV(mb, file);
         } catch (Exception e) {
             assertEquals("File unable to be serialized to",e.getMessage());
         }
@@ -108,7 +106,7 @@ public class BookTest {
         //Nonexistent File
         File nonExistentFile = makeNewFile("books.csv");
         try {
-            LibraryIO.deserializeFromCSV(nonExistentFile);
+            Book.deserializeFromCSV(nonExistentFile);
         } catch (Exception e) {
             assertEquals("File given is unable to deserialize",e.getMessage());
         }
@@ -117,7 +115,7 @@ public class BookTest {
         File dir = makeNewFile("books");
         dir.mkdir();
         try{
-            LibraryIO.deserializeFromCSV(dir);
+            Book.deserializeFromCSV(dir);
         }
         catch (Exception e) {
             assertEquals("File given is unable to deserialize",e.getMessage());
@@ -126,7 +124,7 @@ public class BookTest {
         //wrong file extension
         File invFileExt = makeNewFile("books.txt");
         try{
-            LibraryIO.deserializeFromCSV(invFileExt);
+            Book.deserializeFromCSV(invFileExt);
         }
         catch (Exception e){
             assertEquals("File given is unable to deserialize",e.getMessage());
@@ -149,7 +147,7 @@ public class BookTest {
             System.out.println("Something went wrong when writing to the file, aborting test");
         }
 
-        assertEquals(null, LibraryIO.deserializeFromCSV(exampleCSV));
+        assertEquals(null, Book.deserializeFromCSV(exampleCSV));
         exampleCSV.delete();
 
 
@@ -164,7 +162,7 @@ public class BookTest {
             fw.write("title,author,genre,year"+"\n");
             fw.write("Jane Austen,Romance Novel,1891,Pride and Prejudice"+"\n");
             fw.flush();
-            assertEquals(0,LibraryIO.deserializeFromCSV(exampleCSV).size());
+            assertEquals(0,Book.deserializeFromCSV(exampleCSV).size());
         }
         catch(IOException e){
             System.out.println("Something went wrong when writing to the file, aborting test");
@@ -176,7 +174,7 @@ public class BookTest {
             fw.write("title,author,genre,year"+"\n");
             fw.write("Pride and Prejudice, Jane Austen, Romance Novel"+"\n");
             fw.flush();
-            assertEquals(0,LibraryIO.deserializeFromCSV(exampleCSV).size());
+            assertEquals(0,Book.deserializeFromCSV(exampleCSV).size());
         }
         catch(IOException e){
             System.out.println("Something went wrong when writing to the file, aborting test");
@@ -187,7 +185,7 @@ public class BookTest {
             //erase file and restart
             fw.write("title,author,genre,year"+"\n");
             fw.flush();
-            assertEquals(0,LibraryIO.deserializeFromCSV(exampleCSV).size());
+            assertEquals(0,Book.deserializeFromCSV(exampleCSV).size());
         }
         catch(IOException e){
             System.out.println("Something went wrong when writing to the file, aborting test");
@@ -202,8 +200,8 @@ public class BookTest {
     void testOneBookXMLFileSerialization(){
         File file = makeNewFile("Books.xml");
         Book book1 = new Book("1","2","3",4,true);
-        LibraryIO.serializeToXML(book1,file);
-        assertEquals(book1, LibraryIO.deserializeFromXML(file).first());
+        Book.serializeToXML(book1,file);
+        assertEquals(book1, Book.deserializeFromXML(file).first());
         file.delete();
     }
 
@@ -219,7 +217,7 @@ public class BookTest {
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
         TreeSet<Book> booksFromXML;
 
-        LibraryIO.serializeToXML(books,file);
+        Book.serializeToXML(books,file);
 
         XStream xstream = setUpXstream();
         try {
@@ -252,7 +250,7 @@ public class BookTest {
             throw new RuntimeException(e);
         }
 
-        TreeSet<Book> resultBooks = LibraryIO.deserializeFromXML(file);
+        TreeSet<Book> resultBooks = Book.deserializeFromXML(file);
         assertEquals(books, resultBooks, "Deserialized books do not match the original set");
 
         file.delete();
@@ -262,18 +260,18 @@ public class BookTest {
     @Test
     void testFileForSerialization() {
         File file = makeNewFile("Books.csv");
-        assertTrue(LibraryIO.testFileForSerialization(file, ".csv"));
-        assertFalse(LibraryIO.testFileForSerialization(file, ".txt"));
+        assertTrue(Book.testFileForSerialization(file, ".csv"));
+        assertFalse(Book.testFileForSerialization(file, ".txt"));
         file.delete();
 
         file = makeNewFile("Book.xml");
-        assertTrue(LibraryIO.testFileForSerialization(file, ".xml"));
-        assertFalse(LibraryIO.testFileForSerialization(file, ".txt"));
+        assertTrue(Book.testFileForSerialization(file, ".xml"));
+        assertFalse(Book.testFileForSerialization(file, ".txt"));
         file.delete();
 
         file = makeNewFile("Book");
-        assertFalse(LibraryIO.testFileForSerialization(file, ".csv"));
-        assertFalse(LibraryIO.testFileForSerialization(file, ".txt"));
+        assertFalse(Book.testFileForSerialization(file, ".csv"));
+        assertFalse(Book.testFileForSerialization(file, ".txt"));
         file.delete();
     }
 }
