@@ -1,6 +1,8 @@
 package org.BookManager;
 
-
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Set;
 
 
 public class Main {
@@ -9,10 +11,25 @@ public class Main {
 //        File fileXML = new File("Library.xml");
 //
 //        File fileCSV = new File("Library.csv");
+        File fileBIN = new File("Library.bin");
 //
-//        Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022,false);
-//        Book tkamb2 = new Book("Te","D","Romance",2022,false);
-//        Book invisible = new Book("Invisible","Rob","Novel",2013,true);
+        Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022,false);
+        Book tkamb2 = new Book("Te","D","Romance",2022,false);
+        Book invisible = new Book("Invisible","Rob","Novel",2013,true);
+        ArrayList<Book> books = new ArrayList<>(Set.of(tkamb2,tkamb,invisible));
+        try {
+            fileBIN.createNewFile();
+            ObjectSerializer.serializeToBinary(books,fileBIN);
+            ArrayList<Serializable> listt = new ArrayList<>(ObjectSerializer.deserializeFromBinary(fileBIN));
+            ArrayList<Book> listt2 = new ArrayList<>();
+            listt.forEach(x -> listt2.add((Book)x));
+            listt2.forEach(System.out::println);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
 //
 ////
 //        LibraryIO.serializeToXML(tkamb, fileXML);

@@ -6,10 +6,55 @@ import com.thoughtworks.xstream.io.StreamException;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 public class ObjectSerializer {
+
+    public static void serializeToBinary(Object obj, File file) throws IOException, IllegalArgumentException {
+        if(!(obj instanceof Serializable)){
+            throw new IllegalArgumentException("Object passed in must implement Serializable");
+        }
+
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+
+            List<Serializable> listOfObjects = new ArrayList<>();
+            //unravel collections
+            if(obj instanceof Collection){
+                getNonCollectionObjs(Serializable.class,(Collection<?>) obj,listOfObjects);
+            }
+            else{
+                listOfObjects.add((Serializable) obj);
+            }
+            for(Object o : listOfObjects){
+                out.writeObject(o);
+            }
+        }
+    }
+
+    public static List<Serializable> deserializeFromBinary(File file) throws IOException {
+        List<Serializable> listOfObjects = new ArrayList<>();
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            while(true){
+                Object o = in.readObject();
+                if (o instanceof Collection) {
+                    getNonCollectionObjs(Serializable.class, (Collection<?>) o, listOfObjects);
+                }
+                else if(o instanceof Serializable){
+                    listOfObjects.add((Serializable) o);
+                }
+            }
+        }
+        catch(EOFException e){
+            //
+        }
+        catch(ClassNotFoundException e){
+            System.out.println("Class not found: " + e.getMessage());
+        }
+        return listOfObjects;
+    }
     /**
      * <h6>Description:</h6>
      * <li>Serializes any object by overwriting the entire file with the objects given using XStream.
@@ -32,9 +77,9 @@ public class ObjectSerializer {
              ObjectOutputStream out = xstream.createObjectOutputStream(fos,rootName)){
 
             if (!keepStructure && obj instanceof Collection) {
-                HashSet<Object> objHashSet = new HashSet<>();
-                getNonCollectionObjs(Object.class, (Collection<?>) obj, objHashSet);
-                for (Object o : objHashSet) {
+                List<Object> objList = new ArrayList<>();
+                getNonCollectionObjs(Object.class, (Collection<?>) obj, objList);
+                for (Object o : objList) {
                     out.writeObject(o);
                 }
             }
@@ -58,8 +103,8 @@ public class ObjectSerializer {
      * @throws IOException  In the event where file cannot be read or written to
 
      */
-    public static <T> HashSet<T> deserializeObjFromXML(Class<T> desiredClass, XStream xstream, File file, boolean keepStructure) throws IOException {
-        HashSet<T> deserializedObjects = new HashSet<>();
+    public static <T> List<T> deserializeObjFromXML(Class<T> desiredClass, XStream xstream, File file, boolean keepStructure) throws IOException {
+        List<T> deserializedObjects = new ArrayList<>();
         try(FileInputStream fis = new FileInputStream(file);
             ObjectInputStream in = xstream.createObjectInputStream(fis)) {
 
@@ -94,7 +139,7 @@ public class ObjectSerializer {
         return deserializedObjects;
     }
 
-    public static <T> void getNonCollectionObjs(Class<T> desiredClass, Collection<?> collection, HashSet<T> ts){
+    public static <T> void getNonCollectionObjs(Class<T> desiredClass, Collection<?> collection, List<T> ts){
         for(Object o : collection){
             if(o instanceof Collection<?>){
                 getNonCollectionObjs(desiredClass, (Collection<?>)o, ts);
