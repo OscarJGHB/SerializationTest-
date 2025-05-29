@@ -21,6 +21,9 @@ public class Book implements Serializable, Comparable<Book> {
     private int year;
     @XStreamConverter(value = BooleanConverter.class,booleans = {true,false},strings = {"yes","no"})
     private boolean pictures;
+    private static final String csvHeader = "title,author,genre,year";
+    private static final XStream xstream = setUpXstream();
+
 
     public Book(){
         this.title = "";
@@ -87,9 +90,6 @@ public class Book implements Serializable, Comparable<Book> {
         return title + "," + author + "," + genre + "," + year;
     }
 
-    private static final String csvHeader = "title,author,genre,year";
-    private static final XStream xstream = setUpXstream();
-
     public static String getCSVHeader(){
         return csvHeader;
     }
@@ -152,7 +152,7 @@ public class Book implements Serializable, Comparable<Book> {
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
-        Collection<Object> listOfObjFromFile = new HashSet<>();
+        Collection<Book> listOfObjFromFile = new HashSet<>();
         try{
             listOfObjFromFile.addAll(ObjectSerializer.deserializeObjFromXML(Book.class ,xstream, file, false));
             listOfObjFromFile.addAll(listOfBooks);
@@ -165,7 +165,7 @@ public class Book implements Serializable, Comparable<Book> {
         }
         catch (ConversionException | StreamException e) {
             System.out.println("File is empty or corrupted, rewriting file");
-            listOfObjFromFile.add(listOfBooks);
+            listOfObjFromFile.addAll(listOfBooks);
         }
 
         try{
@@ -205,6 +205,46 @@ public class Book implements Serializable, Comparable<Book> {
             System.out.println("Error accessing file");
         }
 
+    }
+
+    public static void serializeToBinary(Book book, File file) throws IllegalArgumentException {
+        serializeToBinary(new TreeSet<>(Set.of(book)), file);
+    }
+    public static void serializeToBinary(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
+        if (listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".bin")){
+            throw new IllegalArgumentException("File given is unable to deserialize");
+        }
+
+        Collection<Book> listOfObjFromFile = new TreeSet<>();
+        try{
+            for(Serializable obj : ObjectSerializer.deserializeFromBinary(file)){
+                try{
+                    listOfObjFromFile.add((Book)obj);
+                }
+                catch (ClassCastException e){
+                    //skip
+                    System.out.println("Class Cast Exception");
+                }
+            }
+            listOfObjFromFile.addAll(listOfBooks);
+        }
+        catch (IOException e){
+            System.out.println("Error serializing to file, stopping serialization");
+        }
+        catch(NullPointerException e){
+            System.out.println("Null Pointer Exception, stopping serialization");
+        }
+        catch (ConversionException | StreamException | IllegalArgumentException e) {
+            System.out.println("File is empty or corrupted, rewriting file");
+            listOfObjFromFile.addAll(listOfBooks);
+        }
+
+        try{
+            ObjectSerializer.serializeToBinary(listOfObjFromFile, file);
+        }
+        catch (IOException e){
+            System.out.println("Error serializing to file, stopping serialization");
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -270,6 +310,33 @@ public class Book implements Serializable, Comparable<Book> {
         }
         catch(FileNotFoundException e) {
             System.out.println("Error accessing file");
+            return null;
+        }
+        return treeSetOfBooks;
+    }
+
+    public static TreeSet<Book> deserializeFromBinary(File file) throws IllegalArgumentException {
+        if (!testFileForDeserialization(file,".bin")){
+            throw new IllegalArgumentException("File given is unable to deserialize");
+        }
+        TreeSet<Book> treeSetOfBooks = new TreeSet<>();
+        try{
+            for(Serializable obj: ObjectSerializer.deserializeFromBinary(file)){
+                try{
+                    treeSetOfBooks.add((Book)obj);
+                }
+                catch (ClassCastException e){
+                    //skip
+                    System.out.println("Class Cast Exception");
+                }
+            }
+        }
+        catch(IOException e) {
+            System.out.println("Error accessing file");
+            return null;
+        }
+        catch (ConversionException | StreamException e) {
+            System.out.println("File is corrupted, aborting deserialization");
             return null;
         }
         return treeSetOfBooks;
