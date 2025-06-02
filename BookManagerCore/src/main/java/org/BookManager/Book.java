@@ -14,12 +14,10 @@ import java.util.*;
 @XStreamAlias("Book")
 public class Book implements Serializable, Comparable<Book> {
 
-    @XStreamAsAttribute
     private String title;
     private String author;
     private String genre;
     private int year;
-    @XStreamConverter(value = BooleanConverter.class,booleans = {true,false},strings = {"yes","no"})
     private boolean pictures;
     private static final String csvHeader = "title,author,genre,year";
     private static final XStream xstream = setUpXstream();
@@ -30,32 +28,49 @@ public class Book implements Serializable, Comparable<Book> {
         this.author = "";
         this.genre = "";
         this.year = 0;
+        this.pictures = false;
     }
     public Book(String title, String author, String genre, int year, boolean pictures) {
-        this.title = title.trim();
+        this();
+        this.title = (title + this.title).trim();
         this.author = author.trim();
         this.genre = genre.trim();
         this.year = year;
         this.pictures = pictures;
     }
 
+    //GETTERS
     public String getTitle() {
         return title;
     }
     public String getAuthor() {
         return author;
     }
-
     public String getGenre() {
         return genre;
     }
-
     public int getYear() {
         return year;
     }
-
     public boolean getPictures() {
         return pictures;
+    }
+
+    //SETTERS
+    public void setTitle(String title) {
+        this.title = title.trim();
+    }
+    public void setAuthor(String author) {
+        this.author = author.trim();
+    }
+    public void setGenre(String genre) {
+        this.genre = genre.trim();
+    }
+    public void setYear(int year) {
+        this.year = year;
+    }
+    public void setPictures(boolean pictures) {
+        this.pictures = pictures;
     }
 
     @Override
@@ -87,7 +102,7 @@ public class Book implements Serializable, Comparable<Book> {
 
     @Override
     public String toString() {
-        return title + "," + author + "," + genre + "," + year;
+        return String.format("%s, %s, %s, %d, %b", title, author, genre, year, pictures);
     }
 
     public static String getCSVHeader(){
@@ -99,9 +114,11 @@ public class Book implements Serializable, Comparable<Book> {
         xstream.alias("Library", Set.class);
         xstream.allowTypes(new Class[] { Book.class });
         xstream.processAnnotations(Book.class);
+        xstream.registerConverter(new BookConverter());
         return xstream;
     }
 
+    //IO METHODS
     //returns true if file is a file/created
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean testFileForSerialization(File file, String fileExt){
@@ -210,6 +227,7 @@ public class Book implements Serializable, Comparable<Book> {
     public static void serializeToBinary(Book book, File file) throws IllegalArgumentException {
         serializeToBinary(new TreeSet<>(Set.of(book)), file);
     }
+
     public static void serializeToBinary(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
         if (listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".bin")){
             throw new IllegalArgumentException("File given is unable to deserialize");

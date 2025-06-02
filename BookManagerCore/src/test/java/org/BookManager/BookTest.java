@@ -278,4 +278,6 @@ public class BookTest {
         assertFalse(Book.testFileForSerialization(file, ".txt"));
         file.delete();
     }
+
+    //TODO: MAKE TESTS FOR BINARY SERIALIZATION
 }

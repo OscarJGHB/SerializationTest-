@@ -9,18 +9,20 @@ import java.util.TreeSet;
 public class Main {
     public static void main(String[] args) {
 
-//        File fileXML = new File("Library.xml");
+        File fileXML = new File("Library.xml");
 //
 //        File fileCSV = new File("Library.csv");
-        File fileBIN = new File("Library.bin");
-//
+//        File fileBIN = new File("Library.bin");
+////
         Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022,false);
         Book tkamb2 = new Book("Te","D","Romance",2022,false);
         Book invisible = new Book("Invisible","Rob","Novel",2013,true);
+
+
         ArrayList<Book> books = new ArrayList<>(Set.of(tkamb2,tkamb,invisible));
         try {
-            Book.serializeToBinary(books,fileBIN);
-            TreeSet<Book> treeSetOfBooks = Book.deserializeFromBinary(fileBIN);
+            Book.serializeToXML(books,fileXML);
+            TreeSet<Book> treeSetOfBooks = Book.deserializeFromXML(fileXML);
             treeSetOfBooks.forEach(System.out::println);
 
         } catch (IllegalArgumentException e) {

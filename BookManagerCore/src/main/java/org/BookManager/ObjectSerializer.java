@@ -107,7 +107,6 @@ public class ObjectSerializer {
         List<T> deserializedObjects = new ArrayList<>();
         try(FileInputStream fis = new FileInputStream(file);
             ObjectInputStream in = xstream.createObjectInputStream(fis)) {
-
             while(true){
                 try{
                     Object obj = in.readObject();
@@ -138,6 +137,8 @@ public class ObjectSerializer {
 
         return deserializedObjects;
     }
+
+
 
     public static <T> void getNonCollectionObjs(Class<T> desiredClass, Collection<?> collection, List<T> ts){
         for(Object o : collection){
