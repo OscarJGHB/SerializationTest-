@@ -1,4 +1,5 @@
 package org.BookManager.gui;
+import javafx.stage.Stage;
 import org.BookManager.Book;
 
 import javafx.collections.FXCollections;
@@ -22,7 +23,7 @@ public class FXMLController {
     private TextField textField0;
     @FXML
     private TableColumn<Book, String> titleCol;
-    @FXML
+    @F
     private TableColumn<Book, String> authorCol;
     @FXML
     private TableColumn<Book,String> yearCol;
@@ -30,7 +31,11 @@ public class FXMLController {
     private TableColumn<Book, String> genreCol;
     @FXML
     private TableColumn<Book, String> pictureCol;
+    private Stage stage;
 
+    public void setStage(Stage stage){
+        this.stage = stage;
+    }
     public void initialize() {
         String javaVersion = System.getProperty("java.version");
         String javafxVersion = System.getProperty("javafx.version");
@@ -47,21 +52,15 @@ public class FXMLController {
         ObservableList<Book> books = null;
         try {
             if(fileName.endsWith(".csv")){
-                books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromCSV(new File(fileName))));
+                books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromCSV(new File("../"+fileName))));
             }
             else if(fileName.endsWith(".xml")){
-                books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromXML(new File(fileName))));
+                books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromXML(new File("../"+fileName))));
             }
-            if(books == null)
-                throw new IllegalArgumentException();
         } catch (IllegalArgumentException e) {
             label.setText(e.getMessage());
             return;
         }
-
-
         bookTable.setItems(books);
-
-
     }
 }

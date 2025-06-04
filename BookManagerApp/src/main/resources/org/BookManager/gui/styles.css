@@ -1,3 +1,17 @@
+.root
+{
+    -fx-background-color: #bebeda;
+}
 .label {
     -fx-text-fill: blue;
 }
+
+.main_menu-bar{
+    -fx-background-color: #b0b0ff;
+    -fx-font-size: 16px;
+    -fx-padding: 8px;
+    -fx-pref-height: 24px;
+    -fx-pref-width: 64px;
+    -fx-alignment: center;
+}
+

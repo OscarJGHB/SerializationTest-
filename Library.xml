@@ -2,19 +2,19 @@
   <Book title="Invisible">
     <author>Rob</author>
     <genre>Novel</genre>
-    <year>2013</year>
+    <released>2013</released>
     <pictures>yes</pictures>
   </Book>
   <Book title="Te">
     <author>D</author>
     <genre>Romance</genre>
-    <year>2022</year>
+    <released>2022</released>
     <pictures>no</pictures>
   </Book>
   <Book title="TKAMB">
     <author>DOUG</author>
     <genre>FUNNY</genre>
-    <year>2022</year>
+    <released>2022</released>
     <pictures>no</pictures>
   </Book>
 </Library>

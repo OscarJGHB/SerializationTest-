@@ -21,7 +21,8 @@ public class Main {
 
         ArrayList<Book> books = new ArrayList<>(Set.of(tkamb2,tkamb,invisible));
         try {
-            Book.serializeToXML(books,fileXML);
+//            Book.serializeToXML(books,fileXML);
+            System.out.println(fileXML.getAbsolutePath());
             TreeSet<Book> treeSetOfBooks = Book.deserializeFromXML(fileXML);
             treeSetOfBooks.forEach(System.out::println);
 

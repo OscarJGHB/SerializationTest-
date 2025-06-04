@@ -1,10 +1,8 @@
 package org.BookManager;
 
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
@@ -30,7 +28,7 @@ public class BookConverter implements Converter {
         writer.setValue(book.getGenre());
         writer.endNode();
 
-        writer.startNode("year");
+        writer.startNode("released");
         writer.setValue(String.valueOf(book.getYear()));
         writer.endNode();
 

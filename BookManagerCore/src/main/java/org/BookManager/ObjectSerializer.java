@@ -38,12 +38,17 @@ public class ObjectSerializer {
         List<Serializable> listOfObjects = new ArrayList<>();
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
             while(true){
-                Object o = in.readObject();
-                if (o instanceof Collection) {
-                    getNonCollectionObjs(Serializable.class, (Collection<?>) o, listOfObjects);
+                try{
+                    Object o = in.readObject();
+                    if (o instanceof Collection) {
+                        getNonCollectionObjs(Serializable.class, (Collection<?>) o, listOfObjects);
+                    }
+                    else if(o instanceof Serializable){
+                        listOfObjects.add((Serializable) o);
+                    }
                 }
-                else if(o instanceof Serializable){
-                    listOfObjects.add((Serializable) o);
+                catch(EOFException e){
+                    break;
                 }
             }
         }

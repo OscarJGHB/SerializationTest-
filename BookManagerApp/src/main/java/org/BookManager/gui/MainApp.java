@@ -12,12 +12,14 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("org/BookManager/gui/main.fxml"));
-
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("org/BookManager/gui/mainMenu.fxml"));
+        Parent root = loader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getClassLoader().getResource("org/BookManager/gui/styles.css").toExternalForm());
 
-        stage.setTitle("JavaFX and Gradle");
+        FXMLMenuController controller = loader.getController();
+        controller.setStage(stage);
+        stage.setTitle("Library Manager");
         stage.setScene(scene);
         stage.show();
     }

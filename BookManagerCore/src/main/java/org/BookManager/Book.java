@@ -2,10 +2,7 @@ package org.BookManager;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.StreamException;
 
 import java.io.*;
@@ -14,29 +11,21 @@ import java.util.*;
 @XStreamAlias("Book")
 public class Book implements Serializable, Comparable<Book> {
 
-    private String title;
-    private String author;
-    private String genre;
-    private int year;
-    private boolean pictures;
+    private String title = "";
+    private String author = "";
+    private String genre = "";
+    private int year = -1;
+    private boolean pictures = false;
     private static final String csvHeader = "title,author,genre,year";
     private static final XStream xstream = setUpXstream();
 
-
-    public Book(){
-        this.title = "";
-        this.author = "";
-        this.genre = "";
-        this.year = 0;
-        this.pictures = false;
-    }
+    public Book(){};
     public Book(String title, String author, String genre, int year, boolean pictures) {
-        this();
-        this.title = (title + this.title).trim();
-        this.author = author.trim();
-        this.genre = genre.trim();
-        this.year = year;
-        this.pictures = pictures;
+        setTitle(title);
+        setAuthor(author);
+        setGenre(genre);
+        setYear(year);
+        setPictures(pictures);
     }
 
     //GETTERS
@@ -58,14 +47,10 @@ public class Book implements Serializable, Comparable<Book> {
 
     //SETTERS
     public void setTitle(String title) {
-        this.title = title.trim();
+        this.title = (title == null ? this.title : title).trim();
     }
-    public void setAuthor(String author) {
-        this.author = author.trim();
-    }
-    public void setGenre(String genre) {
-        this.genre = genre.trim();
-    }
+    public void setAuthor(String author) {this.author = (author == null ? this.author : author).trim();}
+    public void setGenre(String genre) {this.genre = (genre == null ? this.genre : genre).trim();}
     public void setYear(int year) {
         this.year = year;
     }
@@ -165,7 +150,10 @@ public class Book implements Serializable, Comparable<Book> {
 
     @SuppressWarnings("unchecked")
     public static void serializeToXML(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
-        if(listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".xml")){
+        if(listOfBooks == null || listOfBooks.isEmpty()){
+            throw new IllegalArgumentException("Nothing given to serialize");
+        }
+        else if(!testFileForSerialization(file,".xml")){
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
@@ -198,7 +186,10 @@ public class Book implements Serializable, Comparable<Book> {
     }
 
     public static void serializeToCSV(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
-        if(listOfBooks == null || listOfBooks.isEmpty() || listOfBooks.contains(null) || !testFileForSerialization(file,".csv")){
+        if(listOfBooks == null || listOfBooks.isEmpty() || listOfBooks.contains(null)){
+            throw new IllegalArgumentException("Nothing given to serialize");
+        }
+        else if( !testFileForSerialization(file,".csv")){
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
@@ -229,8 +220,11 @@ public class Book implements Serializable, Comparable<Book> {
     }
 
     public static void serializeToBinary(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
-        if (listOfBooks == null || listOfBooks.isEmpty() || !testFileForSerialization(file,".bin")){
-            throw new IllegalArgumentException("File given is unable to deserialize");
+        if (listOfBooks == null || listOfBooks.isEmpty()){
+            throw new IllegalArgumentException("Nothing given to serialize");
+        }
+        else if(!testFileForSerialization(file,".bin")){
+            throw new IllegalArgumentException("File unable to be serialized to");
         }
 
         Collection<Book> listOfObjFromFile = new TreeSet<>();
@@ -247,12 +241,14 @@ public class Book implements Serializable, Comparable<Book> {
             listOfObjFromFile.addAll(listOfBooks);
         }
         catch (IOException e){
-            System.out.println("Error serializing to file, stopping serialization");
+            System.out.println("Error serializing to file, attempting to serialize to another file");
+            file = new File("temp"+file.getAbsoluteFile());
         }
         catch(NullPointerException e){
             System.out.println("Null Pointer Exception, stopping serialization");
+            return;
         }
-        catch (ConversionException | StreamException | IllegalArgumentException e) {
+        catch (ConversionException | StreamException e) {
             System.out.println("File is empty or corrupted, rewriting file");
             listOfObjFromFile.addAll(listOfBooks);
         }
