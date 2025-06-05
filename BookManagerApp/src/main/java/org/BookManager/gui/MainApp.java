@@ -9,17 +9,14 @@ import javafx.stage.Stage;
 
 //WIP
 public class MainApp extends Application {
-
+    static final String appName = "Library Manager";
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("org/BookManager/gui/mainMenu.fxml"));
-        Parent root = loader.load();
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("org/BookManager/gui/main.fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getClassLoader().getResource("org/BookManager/gui/styles.css").toExternalForm());
 
-        FXMLMenuController controller = loader.getController();
-        controller.setStage(stage);
-        stage.setTitle("Library Manager");
+        stage.setTitle(appName);
         stage.setScene(scene);
         stage.show();
     }

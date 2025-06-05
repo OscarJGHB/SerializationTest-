@@ -7,11 +7,17 @@
 }
 
 .main_menu-bar{
-    -fx-background-color: #b0b0ff;
-    -fx-font-size: 16px;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #b0b0ff);
+    -fx-font-size: 12px;
     -fx-padding: 8px;
-    -fx-pref-height: 24px;
-    -fx-pref-width: 64px;
+    -fx-pref-height: 14px;
+    -fx-alignment: center;
+}
+.side_main_menu-bar{
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #a6a6a6, #4a4aff);
+    -fx-font-size: 12px;
+    -fx-padding: 8px;
+    -fx-pref-height: 14px;
     -fx-alignment: center;
 }
 

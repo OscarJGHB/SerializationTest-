@@ -17,4 +17,10 @@
     <released>2022</released>
     <pictures>no</pictures>
   </Book>
+  <Book title="Invisible2">
+    <author>Rob</author>
+    <genre>Novel</genre>
+    <released>2013</released>
+    <pictures>yes</pictures>
+  </Book>
 </Library>

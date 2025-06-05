@@ -17,11 +17,11 @@ public class Main {
         Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022,false);
         Book tkamb2 = new Book("Te","D","Romance",2022,false);
         Book invisible = new Book("Invisible","Rob","Novel",2013,true);
+        Book invisible2 = new Book("Invisible2","Rob","Novel",2013,true);
 
-
-        ArrayList<Book> books = new ArrayList<>(Set.of(tkamb2,tkamb,invisible));
+        ArrayList<Book> books = new ArrayList<>(Set.of(tkamb2,tkamb,invisible,invisible2));
         try {
-//            Book.serializeToXML(books,fileXML);
+            Book.serializeToXML(books,fileXML);
             System.out.println(fileXML.getAbsolutePath());
             TreeSet<Book> treeSetOfBooks = Book.deserializeFromXML(fileXML);
             treeSetOfBooks.forEach(System.out::println);
