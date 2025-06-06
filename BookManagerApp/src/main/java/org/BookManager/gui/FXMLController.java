@@ -262,6 +262,7 @@ public class FXMLController {
         try{
             System.out.println("Saving file to: " + file.getAbsolutePath());
 
+            //TODO
             FileWriter writer = new FileWriter(file);
             writer.close();
 
@@ -406,15 +407,4 @@ public class FXMLController {
             label.setText("No file loaded in");
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 }

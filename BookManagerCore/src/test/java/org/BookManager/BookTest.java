@@ -3,25 +3,20 @@ package org.BookManager;
 import com.thoughtworks.xstream.XStream;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookTest {
 
-    public XStream setUpXstream(){
+    public static XStream setUpXstream(){
         XStream xstream = new XStream();
+        xstream.alias("Library", Set.class);
         xstream.alias("Book", Book.class);
-        xstream.autodetectAnnotations(true);
         xstream.allowTypes(new Class[] { Book.class });
+        xstream.processAnnotations(Book.class);
         xstream.registerConverter(new BookConverter());
         return xstream;
     }
@@ -261,6 +256,103 @@ public class BookTest {
         file.delete();
     }
 
+    @Test
+    void testRandomEntryInBooksXMLFileDeserialization(){
+        File fileWithoutStructure = makeNewFile("Anything.xml");
+        File fileWithStructure = makeNewFile("Anything1.xml");
+        Book book1 = new Book("1","2","3",4,true);
+        Book book2 = new Book("a","b","c",4,true);
+        Book book3 = new Book("T","O","M",4,true);
+        Book book4 = new Book("A","R","F",4,true);
+        String wrong1 = "Not a Book";
+        Integer wrong2 = 0;
+        Collection<Book> correctBooks = new TreeSet<>(Set.of(book1,book2,book3,book4));
+        Collection<Object> randomObjects = new HashSet<>(Set.of(book1,book2,book3,book4,wrong1,wrong2));
+        TreeSet<Book> booksFromXML = new TreeSet<Book>();
+        try{
+            XStream xstream = setUpXstream();
+            ObjectSerializer.serializeToXML(randomObjects,xstream,"",fileWithoutStructure,false);
+            ObjectSerializer.serializeToXML(randomObjects,xstream,"",fileWithStructure,true);
+            booksFromXML = Objects.requireNonNull(Book.deserializeFromXML(fileWithoutStructure));
+            assertTrue(booksFromXML.equals(Book.deserializeFromXML(fileWithStructure)));
+            assertTrue(booksFromXML.equals(correctBooks));
+
+        }
+        catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        catch (NullPointerException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void testBooksBinarySerialization(){
+        File file = makeNewFile("Books.bin");
+        Book book1 = new Book("1","2","3",4,true);
+        Book book2 = new Book("a","b","c",4,true);
+        Book book3 = new Book("T","O","M",4,true);
+        Book book4 = new Book("A","R","F",4,true);
+        Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
+        TreeSet<Book> booksFromBinary = new TreeSet<>();
+
+        Book.serializeToBinary(books,file);
+        try{
+            ObjectSerializer.deserializeFromBinary(file).forEach(b -> booksFromBinary.add(((Book)b)));
+        }
+        catch(IOException e){
+            throw new RuntimeException(e);
+        }
+
+        assertEquals(books, booksFromBinary, "Deserialized books do not match the original set");
+        file.delete();
+    }
+
+    @Test
+    void testBooksBinaryDeserialization(){
+        File file = makeNewFile("Books.bin");
+        Book book1 = new Book("1","2","3",4,true);
+        Book book2 = new Book("a","b","c",4,true);
+        Book book3 = new Book("T","O","M",4,true);
+        Book book4 = new Book("A","R","F",4,true);
+        Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
+        TreeSet<Book> booksFromBinary = new TreeSet<>();
+
+        try {
+            ObjectSerializer.serializeToBinary(books,file);
+            booksFromBinary = Book.deserializeFromBinary(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        assertEquals(books, booksFromBinary, "Deserialized books do not match the original set");
+    }
+
+    @Test
+    void testRandomEntryInBooksBinaryFileDeserialization(){
+        File file = makeNewFile("Anything.bin");
+        Book book1 = new Book("1","2","3",4,true);
+        Book book2 = new Book("a","b","c",4,true);
+        Book book3 = new Book("T","O","M",4,true);
+        Book book4 = new Book("A","R","F",4,true);
+        String wrong1 = "Not a Book";
+        Integer wrong2 = 0;
+        Collection<Book> correctBooks = new TreeSet<>(Set.of(book1,book2,book3,book4));
+        Collection<Object> randomObjects = new HashSet<>(Set.of(book1,book2,book3,book4,wrong1,wrong2));
+        TreeSet<Book> booksFromBIN = new TreeSet<Book>();
+        try{
+            ObjectSerializer.serializeToBinary(randomObjects,file);
+            booksFromBIN = Objects.requireNonNull(Book.deserializeFromBinary(file));
+            assertTrue(booksFromBIN.equals(correctBooks));
+
+        }
+        catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        catch (NullPointerException e){
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     void testFileForSerialization() {
@@ -280,5 +372,4 @@ public class BookTest {
         file.delete();
     }
 
-    //TODO: MAKE TESTS FOR BINARY SERIALIZATION;
 }

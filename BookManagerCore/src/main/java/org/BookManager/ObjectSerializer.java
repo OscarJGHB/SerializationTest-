@@ -13,6 +13,7 @@ import java.util.List;
 
 public class ObjectSerializer {
 
+    //TODO add keepstructure
     public static void serializeToBinary(Object obj, File file) throws IOException, IllegalArgumentException {
         if(!(obj instanceof Serializable)){
             throw new IllegalArgumentException("Object passed in must implement Serializable");
