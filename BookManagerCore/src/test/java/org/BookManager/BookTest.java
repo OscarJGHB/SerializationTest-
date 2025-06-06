@@ -284,8 +284,12 @@ public class BookTest {
         catch (NullPointerException e){
             throw new RuntimeException(e);
         }
+
+        fileWithoutStructure.delete();
+        fileWithStructure.delete();
     }
 
+    //TODO close output stream in bin serialization
     @Test
     void testBooksBinarySerialization(){
         File file = makeNewFile("Books.bin");
@@ -326,6 +330,7 @@ public class BookTest {
         }
 
         assertEquals(books, booksFromBinary, "Deserialized books do not match the original set");
+        file.delete();
     }
 
     @Test
@@ -352,6 +357,7 @@ public class BookTest {
         catch (NullPointerException e){
             throw new RuntimeException(e);
         }
+        file.delete();
     }
 
     @Test
