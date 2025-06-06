@@ -11,33 +11,67 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.BookManager.gui.FXMLController">
 
-        <HBox fx:id="toolBarContainer"
-            AnchorPane.leftAnchor="0"
-            AnchorPane.topAnchor="0">
-            <MenuBar fx:id="menuBar" styleClass="main_menu-bar">
-                <Menu fx:id="fileOptionsMenu">
-                    <MenuItem fx:id = "menuItem0" onAction="#menuItem0Task"/>
-                    <MenuItem fx:id = "menuItem1" onAction="#menuItem1Task"/>
-                </Menu>
-                <Menu fx:id="openLibrariesMenu" visible="false">
-                </Menu>
-            </MenuBar>
-        </HBox>
+        <AnchorPane
+            AnchorPane.topAnchor="0"
+            AnchorPane.bottomAnchor="0"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.leftAnchor="0">
+            <HBox fx:id="toolBarHBox"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.topAnchor="0">
+                <MenuBar fx:id="menuBar" styleClass="main_menu-bar">
+                    <Menu fx:id="fileOptionsMenu">
+                        <MenuItem fx:id = "filesOptionsMenuItem0" onAction="#makeBlankLibrary"/>
+                        <MenuItem fx:id = "filesOptionsMenuItem1" onAction="#importLibrary"/>
+                        <MenuItem fx:id = "filesOptionsMenuItem2" onAction="#saveCurrentLibrary"/>
+                        <MenuItem fx:id = "filesOptionsMenuItem3" onAction="#saveToFile"/>
+                    </Menu>
+                    <Menu fx:id="generalOptionsMenu">
+                        <Menu fx:id="generalOptionsSubMenu0">
+                            <MenuItem fx:id="generalOptionsSubMenuItem0" onAction="#setDefaultFileFormat"/>
+                            <MenuItem fx:id="generalOptionsSubMenuItem1" onAction="#setDefaultFileFormat"/>
+                            <MenuItem fx:id="generalOptionsSubMenuItem2" onAction="#setDefaultFileFormat"/>
+                        </Menu>
+                    </Menu>
+                </MenuBar>
+            </HBox>
+            <Label fx:id="label"
+                   AnchorPane.rightAnchor="0"
+                   AnchorPane.bottomAnchor="0"/>
+            <VBox
+                alignment="CENTER"
+                AnchorPane.topAnchor="100"
+                >
+                <Label  fx:id="instructionLabel"
+                        styleClass="header"
+                        />
+                <Label text=
+                       "&#10;&#9;Select the &quot;File&quot; option to either import or start a new file
+                        &#10;&#9;Select the &quot;Options&quot; option to set your default file format(for serialization)
+                        &#10;&#9;Currently, the save file option does not save correctly- Only save as does"
+                       styleClass="paragraph"/>
+            </VBox>
+        </AnchorPane>
+
 
         <AnchorPane fx:id="tablePane"
             AnchorPane.topAnchor="40"
             AnchorPane.leftAnchor="0"
             AnchorPane.rightAnchor="0"
-            AnchorPane.bottomAnchor="10"
-            visible="false">
+            AnchorPane.bottomAnchor="0
+"
+            visible="false"
+            disable="true">
             <TableView fx:id="bookTable"
                        AnchorPane.bottomAnchor="50"
                        AnchorPane.topAnchor="0"
                        AnchorPane.rightAnchor="0"
-                       AnchorPane.leftAnchor="0"
-                       xmlns:fx="http://javafx.com/fxml" >
+                       AnchorPane.leftAnchor="0" >
                 <columns>
                     <TableColumn fx:id="titleCol" text="Title" prefWidth="120" />
                     <TableColumn fx:id="authorCol" text="Author" prefWidth="120" />
@@ -46,16 +80,16 @@
                     <TableColumn fx:id="pictureCol" text="Picture" prefWidth="120" />
                 </columns>
             </TableView>
-            <TextField fx:id="textField0"
-                AnchorPane.leftAnchor="95"
-                AnchorPane.bottomAnchor="10"
-            />
-            <Label fx:id="label" text="Label"
-                   AnchorPane.rightAnchor="10"
-                   AnchorPane.bottomAnchor="10"/>
-            <Button fx:id="button0" text="Deserialize" onAction="#button0Task"
-                    AnchorPane.bottomAnchor="10"
-                    AnchorPane.leftAnchor="10"
-            />
+            <TabPane fx:id="openLibrariesTabPane"
+                     AnchorPane.bottomAnchor="25"
+                     AnchorPane.leftAnchor="-5"
+                     styleClass="open_tabs_bar"
+            >
+            </TabPane>
+            <HBox alignment="BOTTOM_LEFT"
+                AnchorPane.bottomAnchor="0">
+                <Button fx:id="addBookButton" text="Add Book" onAction="#addABookToTable"/>
+                <Button fx:id="deleteBookButton" text="Delete Book" onAction="#removeABookFromTable"/>
+            </HBox>
         </AnchorPane>
 </AnchorPane>

@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 
 //WIP
 public class MainApp extends Application {
-    static final String appName = "Library Manager";
+    static final String appName = "Library Manager v0.1";
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("org/BookManager/gui/main.fxml"));

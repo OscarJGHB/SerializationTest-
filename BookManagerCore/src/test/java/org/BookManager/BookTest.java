@@ -22,6 +22,7 @@ public class BookTest {
         xstream.alias("Book", Book.class);
         xstream.autodetectAnnotations(true);
         xstream.allowTypes(new Class[] { Book.class });
+        xstream.registerConverter(new BookConverter());
         return xstream;
     }
 
@@ -279,5 +280,5 @@ public class BookTest {
         file.delete();
     }
 
-    //TODO: MAKE TESTS FOR BINARY SERIALIZATION
+    //TODO: MAKE TESTS FOR BINARY SERIALIZATION;
 }

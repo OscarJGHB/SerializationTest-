@@ -4,7 +4,18 @@
 }
 .label {
     -fx-text-fill: blue;
+    -fx-font-family: Arial;
 }
+
+.header{
+    -fx-text-fill: blue;
+    -fx-font: 32px "Arial";
+}
+.paragraph{
+    -fx-text-fill: blue;
+    -fx-font: 16px "Arial";
+}
+
 
 .main_menu-bar{
     -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #b0b0ff);
@@ -13,11 +24,18 @@
     -fx-pref-height: 14px;
     -fx-alignment: center;
 }
-.side_main_menu-bar{
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #a6a6a6, #4a4aff);
-    -fx-font-size: 12px;
-    -fx-padding: 8px;
-    -fx-pref-height: 14px;
-    -fx-alignment: center;
+
+.open_tabs_bar{
+    -fx-background-color: transparent;
+}
+
+.open_tabs_bar .tab
+{
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #b0b0ff);
+}
+
+.open_tabs_bar .tab-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }
 
