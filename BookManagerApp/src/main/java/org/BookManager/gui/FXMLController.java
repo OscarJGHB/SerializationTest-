@@ -22,6 +22,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
 public class FXMLController {
@@ -56,6 +57,12 @@ public class FXMLController {
     private MenuItem generalOptionsSubMenuItem1;
     @FXML
     private MenuItem generalOptionsSubMenuItem2;
+    @FXML
+    private Menu toolsMenu;
+    @FXML
+    private Menu toolsSubMenu0;
+    @FXML
+    private Menu toolsSubMenu1;
     @FXML
     private Label label;
     @FXML
@@ -95,7 +102,7 @@ public class FXMLController {
 
     public void initialize() {
         label.setText(MainApp.appName);
-        defaultSerializationLabel.setText("Currently serializing to " + defaultFileFormat);
+        defaultSerializationLabel.setText("New libraries set to: " + defaultFileFormat);
         instructionLabel.setText(String.format("Welcome to %s!\n", MainApp.appName));
         librarySaves.addListener((MapChangeListener<File,ObservableList<Book>>)change -> {
             updateMenuItems();
@@ -110,9 +117,16 @@ public class FXMLController {
 
     private void updateMenuItems(){
         openLibrariesTabPane.getTabs().clear();
+        toolsSubMenu0.getItems().clear();
+        toolsSubMenu1.getItems().clear();
+
         for(File key : librarySaves.keySet()){
             final File thisFile = key;
             Tab tab = new Tab(thisFile.getName());
+            MenuItem mergeLibraryOption = new MenuItem(thisFile.getName());
+            MenuItem compareLibraryOption = new MenuItem(thisFile.getName());
+
+            //tabs
             tab.setOnSelectionChanged(event -> {
                 if(tab.isSelected()){
                     setCurrentLibrary(thisFile, librarySaves.get(thisFile));}
@@ -120,9 +134,22 @@ public class FXMLController {
             tab.setOnCloseRequest(event -> {
                 removeLibrary(thisFile);
             });
+
+            //merge with
+            mergeLibraryOption.setOnAction(event -> {
+                mergeLibrary(thisFile);
+            });
+
+            //compare
+            compareLibraryOption.setOnAction(event -> {
+                compareLibrary(thisFile);
+            });
+
             tab.setClosable(true);
             openLibrariesTabPane.getTabs().add(tab);
 
+            toolsSubMenu0.getItems().add(mergeLibraryOption);
+            toolsSubMenu1.getItems().add(compareLibraryOption);
         }
     }
 
@@ -226,6 +253,7 @@ public class FXMLController {
         return file;
     }
 
+    //TODO decline blank book
     private Book bookForm(String instruction){
         Parent root = null;
         FXMLLoader loader = null;
@@ -274,9 +302,45 @@ public class FXMLController {
         }
     }
 
+    private void mergeLibrary(File file){
+        if(!file.equals(currentFile)){
+            librarySaves.get(currentFile).addAll(librarySaves.get(file));
+            setCurrentLibrary(currentFile, librarySaves.get(currentFile));
+            label.setText("Library successfully merged");
+            return;
+        }
+        label.setText("Attempted to merge the same Library...");
+    }
+
+    //Compares in memory libraries and outputs new file yet to be saved
+    private void compareLibrary(File file){
+        if(!file.equals(currentFile)){
+            HashSet<Book> currentLib = new HashSet<>(librarySaves.get(currentFile));
+            HashSet<Book> libInQuestion = new HashSet<>(librarySaves.get(file));
+            ObservableList<Book> uniqueItemsLib = FXCollections.observableArrayList();
+
+            for(Book book : libInQuestion){
+                if(!currentLib.contains(book)){
+                    uniqueItemsLib.add(book);
+                }
+            }
+            for(Book book : currentLib){
+                if(!libInQuestion.contains(book)){
+                    uniqueItemsLib.add(book);
+                }
+            }
+
+            File uniqueItemsFile = new File(currentFile.getName()+"AND"+file.getName()+defaultFileFormat);
+            librarySaves.put(uniqueItemsFile, uniqueItemsLib);
+            setCurrentLibrary(uniqueItemsFile, uniqueItemsLib);
+            label.setText("Libraries compared created new file in: " + uniqueItemsFile.getAbsolutePath());
+            return;
+        }
+        label.setText("Attempted to compare the same Library...");
+    }
+
     @FXML
-    private
- void setDefaultFileFormat(ActionEvent event){
+    private void setDefaultFileFormat(ActionEvent event){
         setDefaultFileFormat(((MenuItem)event.getSource()).getText());
         System.out.println("Default File Format: " + defaultFileFormat);
     }
@@ -296,8 +360,7 @@ public class FXMLController {
 
     //get existing file
     @FXML
-    private
- void importLibrary(){
+    private void importLibrary(){
         try{
             File file = Objects.requireNonNull(selectFile());
             librarySaves.put(file, Objects.requireNonNull(setCurrentLibrary(file)));
@@ -312,24 +375,28 @@ public class FXMLController {
     }
 
     @FXML
-    private
- void addABookToTable(){
-        Book book = bookForm("Adding book to library");
-        ObservableList<Book> currentLib = librarySaves.get(currentFile);
-        currentLib.add(book);
-        setCurrentLibrary(currentFile, currentLib);
+    private void addABookToTable(){
+        try{
+            Book book = Objects.requireNonNull(bookForm("Adding book to library"));
+            ObservableList<Book> currentLib = librarySaves.get(currentFile);
+            currentLib.add(book);
+            setCurrentLibrary(currentFile, currentLib);
+        }
+        catch (NullPointerException e){
+            label.setText("No book added");
+        }
     }
 
     @FXML
-    private
- void removeABookFromTable(){
+    private void removeABookFromTable(){
         Book book = null;
         try {
             book = Objects.requireNonNull(bookForm("Removing everything that matches given text fields\n" +
                     "Fields left blank will include all"));
         }
         catch(NullPointerException e){
-            label.setText("Nothing was typed in");
+            label.setText("Nothing was removed");
+            return;
         }
 
         ObservableList<Book> currentLib = librarySaves.get(currentFile);

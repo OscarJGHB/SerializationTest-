@@ -38,6 +38,10 @@
                             <MenuItem fx:id="generalOptionsSubMenuItem2" text=".csv" onAction="#setDefaultFileFormat"/>
                         </Menu>
                     </Menu>
+                    <Menu fx:id="toolsMenu" text="Tools">
+                        <Menu fx:id="toolsSubMenu0" text="Merge With..."/>
+                        <Menu fx:id="toolsSubMenu1" text="Compare With..."/>
+                    </Menu>
                 </MenuBar>
             </HBox>
             <Label fx:id="label"
@@ -55,7 +59,8 @@
                         />
                 <Label text=
                        "&#10;&#9;Select the &quot;File&quot; option to either import or start a new file
-                        &#10;&#9;Select the &quot;Options&quot; option to set your default file format(for serialization)"
+                        &#10;&#9;Select the &quot;Options&quot; option to set your default file format(for serialization)
+                        &#10;&#9;Note: whenever a file is saved, only unique items will be saved"
                        styleClass="paragraph"/>
             </VBox>
         </AnchorPane>

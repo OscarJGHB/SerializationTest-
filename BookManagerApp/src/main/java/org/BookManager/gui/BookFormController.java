@@ -45,6 +45,8 @@ public class BookFormController {
         }
         boolean picture = Boolean.parseBoolean(pictureField.getText());
         Book book = new Book(title, author,genre,year, picture);
+
+        //if book isn't blank, it will be set. Otherwise, it will be null when acceptedBookObj is requested
         if(!book.equals(new Book())) {
             acceptedBookObj = book;
         }

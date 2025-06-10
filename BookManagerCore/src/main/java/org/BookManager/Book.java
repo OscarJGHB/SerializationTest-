@@ -8,8 +8,6 @@ import com.thoughtworks.xstream.io.StreamException;
 import java.io.*;
 import java.util.*;
 
-//TODO: change serialization via removal of deserialization from it
-//TODO possibly juust make it append instead of serialize
 @XStreamAlias("Book")
 public class Book implements Serializable, Comparable<Book> {
 
