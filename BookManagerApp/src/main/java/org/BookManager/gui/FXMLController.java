@@ -129,7 +129,8 @@ public class FXMLController {
             //tabs
             tab.setOnSelectionChanged(event -> {
                 if(tab.isSelected()){
-                    setCurrentLibrary(thisFile, librarySaves.get(thisFile));}
+                    setCurrentLibrary(thisFile, librarySaves.get(thisFile));
+                }
             });
             tab.setOnCloseRequest(event -> {
                 removeLibrary(thisFile);
@@ -185,22 +186,19 @@ public class FXMLController {
             try {
                     switch((file.getName().split("\\."))[1]){
                     case "csv":
-                        books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromCSV(file)));
+                        books = FXCollections.observableList(new ArrayList<>(Objects.requireNonNull(Book.deserializeFromCSV(file))));
                         break;
                     case "xml":
-                        books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromXML(file)));
+                        books = FXCollections.observableList(new ArrayList<>(Objects.requireNonNull(Book.deserializeFromXML(file))));
                         break;
                     case "bin":
-                        books = FXCollections.observableList(new ArrayList<>(Book.deserializeFromBinary(file)));
+                        books = FXCollections.observableList(new ArrayList<>(Objects.requireNonNull(Book.deserializeFromBinary(file))));
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown file type");
                 }
-            } catch (IllegalArgumentException e) {
-                label.setText(e.getMessage());
-                return null;
             }
-            catch (NullPointerException e) {
+            catch (IllegalArgumentException | NullPointerException e) {
                 label.setText(e.getMessage());
                 return null;
             }
@@ -253,7 +251,6 @@ public class FXMLController {
         return file;
     }
 
-    //TODO decline blank book
     private Book bookForm(String instruction){
         Parent root = null;
         FXMLLoader loader = null;
