@@ -25,17 +25,17 @@
                 AnchorPane.leftAnchor="0"
                 AnchorPane.topAnchor="0">
                 <MenuBar fx:id="menuBar" styleClass="main_menu-bar">
-                    <Menu fx:id="fileOptionsMenu">
-                        <MenuItem fx:id = "filesOptionsMenuItem0" onAction="#makeBlankLibrary"/>
-                        <MenuItem fx:id = "filesOptionsMenuItem1" onAction="#importLibrary"/>
-                        <MenuItem fx:id = "filesOptionsMenuItem2" onAction="#saveCurrentLibrary"/>
-                        <MenuItem fx:id = "filesOptionsMenuItem3" onAction="#saveToFile"/>
+                    <Menu fx:id="fileOptionsMenu" text="File">
+                        <MenuItem fx:id = "filesOptionsMenuItem0" text="New Library" onAction="#makeBlankLibrary"/>
+                        <MenuItem fx:id = "filesOptionsMenuItem1" text="Import Library" onAction="#importLibrary"/>
+                        <MenuItem fx:id = "filesOptionsMenuItem2" text="Save Library" onAction="#saveCurrentLibrary"/>
+                        <MenuItem fx:id = "filesOptionsMenuItem3" text="Save As" onAction="#saveAsLibrary"/>
                     </Menu>
-                    <Menu fx:id="generalOptionsMenu">
-                        <Menu fx:id="generalOptionsSubMenu0">
-                            <MenuItem fx:id="generalOptionsSubMenuItem0" onAction="#setDefaultFileFormat"/>
-                            <MenuItem fx:id="generalOptionsSubMenuItem1" onAction="#setDefaultFileFormat"/>
-                            <MenuItem fx:id="generalOptionsSubMenuItem2" onAction="#setDefaultFileFormat"/>
+                    <Menu fx:id="generalOptionsMenu" text="Options">
+                        <Menu fx:id="generalOptionsSubMenu0" text="Set Default File Format">
+                            <MenuItem fx:id="generalOptionsSubMenuItem0" text=".xml" onAction="#setDefaultFileFormat"/>
+                            <MenuItem fx:id="generalOptionsSubMenuItem1" text=".bin" onAction="#setDefaultFileFormat"/>
+                            <MenuItem fx:id="generalOptionsSubMenuItem2" text=".csv" onAction="#setDefaultFileFormat"/>
                         </Menu>
                     </Menu>
                 </MenuBar>
@@ -43,6 +43,9 @@
             <Label fx:id="label"
                    AnchorPane.rightAnchor="0"
                    AnchorPane.bottomAnchor="0"/>
+            <Label fx:id="defaultSerializationLabel"
+                   AnchorPane.topAnchor="0"
+                   AnchorPane.rightAnchor="0"/>
             <VBox
                 alignment="CENTER"
                 AnchorPane.topAnchor="100"
@@ -52,8 +55,7 @@
                         />
                 <Label text=
                        "&#10;&#9;Select the &quot;File&quot; option to either import or start a new file
-                        &#10;&#9;Select the &quot;Options&quot; option to set your default file format(for serialization)
-                        &#10;&#9;Currently, the save file option does not save correctly- Only save as does"
+                        &#10;&#9;Select the &quot;Options&quot; option to set your default file format(for serialization)"
                        styleClass="paragraph"/>
             </VBox>
         </AnchorPane>

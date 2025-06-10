@@ -1,9 +1,11 @@
 package org.BookManager;
 
+import com.sun.source.tree.Tree;
 import com.thoughtworks.xstream.XStream;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -44,13 +46,13 @@ public class BookTest {
     }
 
 
-    //Tests singular instance of serialization
-    //a header should be made as well as one entry
     @Test
-    void testingSerialization() {
+    void testingCSVSerialization() {
         File file = makeNewFile("books.csv");
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
-        Book.serializeToCSV(mb, file);
+        Book mb0 = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
+        Book mb1 = new Book("How to Train Your Dragon","Dreamworks","Action",2011,true);
+        ArrayList<Book> correctBooks = new ArrayList<>(Set.of(mb0, mb1));
+        Book.serializeToCSV(correctBooks, file);
         List<String> csvEntries;
         try {
             csvEntries = Files.readAllLines(file.toPath());
@@ -60,18 +62,24 @@ public class BookTest {
             return;
         }
         assertEquals(Book.getCSVHeader(), csvEntries.get(0));
-        assertEquals("To Kill a MockingBird,Harper Lee,Thriller,1960,true", csvEntries.get(1));
+        csvEntries.removeFirst();
+        for(int i = 0; i < csvEntries.size(); i++){
+            assertTrue(csvEntries.get(i).equals(correctBooks.get(i).toString()));
+        }
         file.delete();
     }
 
     //tests one instance of deserialization
     @Test
-    void testDeserialization() {
+    void testCSVDeserialization() {
         File file = makeNewFile("books.csv");
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
-        Book.serializeToCSV(mb, file);
+        Book mb0 = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
+        Book mb1 = new Book("How to Train Your Dragon","Dreamworks","Action",2011,true);
+        TreeSet<Book> correctBooks = new TreeSet<>(Set.of(mb0, mb1));
+        Book.serializeToCSV(correctBooks, file);
+
         TreeSet<Book> mbCpy = Book.deserializeFromCSV(file);
-        assertTrue(mb.equals(mbCpy.first()));
+        assertTrue(mbCpy.equals(correctBooks));
         file.delete();
     }
 
@@ -79,9 +87,11 @@ public class BookTest {
     @Test
     void badFileNameToSerializeToCSV(){
         File file = makeNewFile("books.cst");
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
+        Book mb0 = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
+        Book mb1 = new Book("How to Train Your Dragon","Dreamworks","Action",2011,true);
+        ArrayList<Book> correctBooks = new ArrayList<>(Set.of(mb0, mb1));
         try {
-            Book.serializeToCSV(mb, file);
+            Book.serializeToCSV(correctBooks, file);
         } catch (IllegalArgumentException e) {
         }
         assertEquals(0, file.length());
@@ -91,9 +101,11 @@ public class BookTest {
     void giveCSVDirectoryNameToSerializeToCSV(){
         File file = makeNewFile("books.csv");
         file.mkdir();
-        Book mb = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
+        Book mb0 = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
+        Book mb1 = new Book("How to Train Your Dragon","Dreamworks","Action",2011,true);
+        ArrayList<Book> correctBooks = new ArrayList<>(Set.of(mb0, mb1));
         try {
-            Book.serializeToCSV(mb, file);
+            Book.serializeToCSV(correctBooks, file);
         } catch (Exception e) {
             assertEquals("File unable to be serialized to",e.getMessage());
         }
@@ -197,16 +209,7 @@ public class BookTest {
     }
 
     @Test
-    void testOneBookXMLFileSerialization(){
-        File file = makeNewFile("Books.xml");
-        Book book1 = new Book("1","2","3",4,true);
-        Book.serializeToXML(book1,file);
-        assertEquals(book1, Book.deserializeFromXML(file).first());
-        file.delete();
-    }
-
-    @Test
-    void testManyBooksXMLFileSerialization(){
+    void testXMLSerialization(){
         File file = makeNewFile("Books.xml");
 
         Book book1 = new Book("1","2","3",4,true);
@@ -232,7 +235,7 @@ public class BookTest {
     }
 
     @Test
-    void testManyBooksXMLFileDeserialization(){
+    void XMLFileDeserialization(){
         File file = makeNewFile("Books.xml");
 
         Book book1 = new Book("1","2","3",4,true);
@@ -289,7 +292,6 @@ public class BookTest {
         fileWithStructure.delete();
     }
 
-    //TODO close output stream in bin serialization
     @Test
     void testBooksBinarySerialization(){
         File file = makeNewFile("Books.bin");

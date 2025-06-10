@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.*;
 
 //TODO: change serialization via removal of deserialization from it
+//TODO possibly juust make it append instead of serialize
 @XStreamAlias("Book")
 public class Book implements Serializable, Comparable<Book> {
 
@@ -88,7 +89,7 @@ public class Book implements Serializable, Comparable<Book> {
 
     @Override
     public String toString() {
-        return String.format("%s, %s, %s, %d, %b", title, author, genre, year, pictures);
+        return String.format("%s,%s,%s,%d,%b", title, author, genre, year, pictures);
     }
 
     public static String getCSVHeader(){
@@ -145,9 +146,6 @@ public class Book implements Serializable, Comparable<Book> {
         return true;
     }
 
-    public static void serializeToXML(Book book, File file ){
-        serializeToXML(new HashSet<Book>(Set.of(book)), file);
-    }
 
     @SuppressWarnings("unchecked")
     public static void serializeToXML(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
@@ -158,55 +156,28 @@ public class Book implements Serializable, Comparable<Book> {
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
-        Collection<Book> listOfObjFromFile = new HashSet<>();
         try{
-            listOfObjFromFile.addAll(ObjectSerializer.deserializeObjFromXML(Book.class ,xstream, file, false));
-            listOfObjFromFile.addAll(listOfBooks);
-        }
-        catch (IOException e){
-            System.out.println("Error serializing to file, stopping serialization");
-        }
-        catch(NullPointerException e){
-            System.out.println("Null Pointer Exception, stopping serialization");
-        }
-        catch (ConversionException | StreamException e) {
-            System.out.println("File is empty or corrupted, rewriting file");
-            listOfObjFromFile.addAll(listOfBooks);
-        }
-
-        try{
-            ObjectSerializer.serializeToXML(listOfObjFromFile, xstream, "Library" , file, false);
+            ObjectSerializer.serializeToXML(listOfBooks, xstream, "Library" , file, false);
         }
         catch (IOException e){
             System.out.println("Error serializing to file, stopping serialization");
         }
     }
 
-    public static void serializeToCSV(Book book, File file) {
-        serializeToCSV(new HashSet<Book>(Set.of(book)), file);
-    }
 
     public static void serializeToCSV(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
-        if(listOfBooks == null || listOfBooks.isEmpty() || listOfBooks.contains(null)){
+        if(listOfBooks == null || listOfBooks.isEmpty() ){
             throw new IllegalArgumentException("Nothing given to serialize");
         }
         else if( !testFileForSerialization(file,".csv")){
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
-        TreeSet<Book> treeSetOfBooks = new TreeSet<>();
-        try {
-            treeSetOfBooks.addAll(deserializeFromCSV(file));
-        } catch (IllegalArgumentException e) {
-            //do nothing, set will be empty.
-        }
-
         try(FileWriter fw = new FileWriter(file))
         {
             fw.write(csvHeader + "\n");
             fw.flush();
-            treeSetOfBooks.addAll(listOfBooks);
-            for(Book book : treeSetOfBooks){
+            for(Book book : listOfBooks){
                 fw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getGenre() + "," + book.getYear() + "," + book.getPictures()+"\n");
             }
         }
@@ -216,9 +187,6 @@ public class Book implements Serializable, Comparable<Book> {
 
     }
 
-    public static void serializeToBinary(Book book, File file) throws IllegalArgumentException {
-        serializeToBinary(new TreeSet<>(Set.of(book)), file);
-    }
 
     public static void serializeToBinary(Collection<Book> listOfBooks, File file) throws IllegalArgumentException {
         if (listOfBooks == null || listOfBooks.isEmpty()){
@@ -228,34 +196,8 @@ public class Book implements Serializable, Comparable<Book> {
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
-        Collection<Book> listOfObjFromFile = new TreeSet<>();
         try{
-            for(Serializable obj : ObjectSerializer.deserializeFromBinary(file)){
-                try{
-                    listOfObjFromFile.add((Book)obj);
-                }
-                catch (ClassCastException e){
-                    //skip
-                    System.out.println("Class Cast Exception");
-                }
-            }
-            listOfObjFromFile.addAll(listOfBooks);
-        }
-        catch (IOException e){
-            System.out.println("Error serializing to file, attempting to serialize to another file");
-            file = new File("temp"+file.getAbsoluteFile());
-        }
-        catch(NullPointerException e){
-            System.out.println("Null Pointer Exception, stopping serialization");
-            return;
-        }
-        catch (ConversionException | StreamException e) {
-            System.out.println("File is empty or corrupted, rewriting file");
-            listOfObjFromFile.addAll(listOfBooks);
-        }
-
-        try{
-            ObjectSerializer.serializeToBinary(listOfObjFromFile, file);
+            ObjectSerializer.serializeToBinary(listOfBooks, file);
         }
         catch (IOException e){
             System.out.println("Error serializing to file, stopping serialization");
