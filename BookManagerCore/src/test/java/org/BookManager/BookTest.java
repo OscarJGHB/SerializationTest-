@@ -1,11 +1,9 @@
 package org.BookManager;
 
-import com.sun.source.tree.Tree;
 import com.thoughtworks.xstream.XStream;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -62,7 +60,7 @@ public class BookTest {
             return;
         }
         assertEquals(Book.getCSVHeader(), csvEntries.get(0));
-        csvEntries.removeFirst();
+        csvEntries.remove(0);
         for(int i = 0; i < csvEntries.size(); i++){
             assertTrue(csvEntries.get(i).equals(correctBooks.get(i).toString()));
         }
@@ -294,7 +292,7 @@ public class BookTest {
 
     @Test
     void testBooksBinarySerialization(){
-        File file = makeNewFile("Books.bin");
+        File file = makeNewFile("Books.ser");
         Book book1 = new Book("1","2","3",4,true);
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);
@@ -316,7 +314,7 @@ public class BookTest {
 
     @Test
     void testBooksBinaryDeserialization(){
-        File file = makeNewFile("Books.bin");
+        File file = makeNewFile("Books.ser");
         Book book1 = new Book("1","2","3",4,true);
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);
@@ -337,7 +335,7 @@ public class BookTest {
 
     @Test
     void testRandomEntryInBooksBinaryFileDeserialization(){
-        File file = makeNewFile("Anything.bin");
+        File file = makeNewFile("Anything.ser");
         Book book1 = new Book("1","2","3",4,true);
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);

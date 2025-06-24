@@ -17,7 +17,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +75,10 @@ public class FXMLController {
     private TabPane openLibrariesTabPane;
 
 
+
     //Table Page
+    @FXML //fits the table TODO dynamic resizing for multiple open tables
+    private AnchorPane mainAppPane;
     @FXML
     private AnchorPane tablePane;
     @FXML
@@ -84,19 +86,9 @@ public class FXMLController {
     @FXML
     private Button deleteBookButton;
     @FXML
-    private TableView<Book> bookTable;
-    @FXML
     private TextField textField0;
-    @FXML
-    private TableColumn<Book, String> titleCol;
-    @FXML
-    private TableColumn<Book, String> authorCol;
-    @FXML
-    private TableColumn<Book,String> yearCol;
-    @FXML
-    private TableColumn<Book, String> genreCol;
-    @FXML
-    private TableColumn<Book, String> pictureCol;
+
+    private BookTableClass bookTable1 = new BookTableClass();
 
 
 
@@ -120,37 +112,45 @@ public class FXMLController {
         toolsSubMenu0.getItems().clear();
         toolsSubMenu1.getItems().clear();
 
-        for(File key : librarySaves.keySet()){
-            final File thisFile = key;
-            Tab tab = new Tab(thisFile.getName());
-            MenuItem mergeLibraryOption = new MenuItem(thisFile.getName());
-            MenuItem compareLibraryOption = new MenuItem(thisFile.getName());
+        if(librarySaves.isEmpty()){
+            toolsMenu.setDisable(true);
+            nodeTurnOff(mainAppPane);
+        }
+        else {
+            toolsMenu.setDisable(false);
+            nodeTurnOn(mainAppPane);
+            for (File key : librarySaves.keySet()) {
+                final File thisFile = key;
+                Tab tab = new Tab(thisFile.getName());
+                MenuItem mergeLibraryOption = new MenuItem(thisFile.getName());
+                MenuItem compareLibraryOption = new MenuItem(thisFile.getName());
 
-            //tabs
-            tab.setOnSelectionChanged(event -> {
-                if(tab.isSelected()){
-                    setCurrentLibrary(thisFile, librarySaves.get(thisFile));
-                }
-            });
-            tab.setOnCloseRequest(event -> {
-                removeLibrary(thisFile);
-            });
+                //tabs
+                tab.setOnSelectionChanged(event -> {
+                    if (tab.isSelected()) {
+                        setCurrentLibrary(thisFile, librarySaves.get(thisFile));
+                    }
+                });
+                tab.setOnCloseRequest(event -> {
+                    removeLibrary(thisFile);
+                });
 
-            //merge with
-            mergeLibraryOption.setOnAction(event -> {
-                mergeLibrary(thisFile);
-            });
+                //merge with
+                mergeLibraryOption.setOnAction(event -> {
+                    mergeLibrary(thisFile);
+                });
 
-            //compare
-            compareLibraryOption.setOnAction(event -> {
-                compareLibrary(thisFile);
-            });
+                //compare
+                compareLibraryOption.setOnAction(event -> {
+                    compareLibrary(thisFile);
+                });
 
-            tab.setClosable(true);
-            openLibrariesTabPane.getTabs().add(tab);
+                tab.setClosable(true);
+                openLibrariesTabPane.getTabs().add(tab);
 
-            toolsSubMenu0.getItems().add(mergeLibraryOption);
-            toolsSubMenu1.getItems().add(compareLibraryOption);
+                toolsSubMenu0.getItems().add(mergeLibraryOption);
+                toolsSubMenu1.getItems().add(compareLibraryOption);
+            }
         }
     }
 
@@ -171,8 +171,7 @@ public class FXMLController {
 
     //sets current library and uses in memory list
     private void setCurrentLibrary(File file , ObservableList<Book> library){
-        nodeTurnOn(bookTable);
-        bookTable.setItems(library);
+        bookTable1.setItems(library);
         setStageName(MainApp.appName +" "+ file.getName());
         this.currentFile = file;
     }
@@ -180,7 +179,6 @@ public class FXMLController {
     //sets current library and uses file
     //first time opening
     private ObservableList<Book> setCurrentLibrary(File file){
-        nodeTurnOn(bookTable);
         ObservableList<Book> books = FXCollections.observableArrayList();
         if(file.length() > 0){
             try {
@@ -191,7 +189,7 @@ public class FXMLController {
                     case "xml":
                         books = FXCollections.observableList(new ArrayList<>(Objects.requireNonNull(Book.deserializeFromXML(file))));
                         break;
-                    case "bin":
+                    case "ser":
                         books = FXCollections.observableList(new ArrayList<>(Objects.requireNonNull(Book.deserializeFromBinary(file))));
                         break;
                     default:
@@ -203,9 +201,10 @@ public class FXMLController {
                 return null;
             }
         }
-        bookTable.setItems(books);
+        bookTable1.setItems(books);
         setStageName(MainApp.appName +" "+ file.getName());
         this.currentFile = file;
+
 
         return books;
     }
@@ -213,7 +212,7 @@ public class FXMLController {
     public void removeLibrary(File library){
         librarySaves.remove(library);
         if(openLibrariesTabPane.getTabs().isEmpty()){
-            nodeTurnOff(bookTable);
+            nodeTurnOff(mainAppPane);
         }
         else{
             openLibrariesTabPane.getSelectionModel().select(0);
@@ -223,11 +222,9 @@ public class FXMLController {
 
     //opens up a blank sheet
     private void setUpTable(){
-        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
-        yearCol.setCellValueFactory(new PropertyValueFactory<>("year"));
-        genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
-        pictureCol.setCellValueFactory(new PropertyValueFactory<>("pictures"));
+        tablePane.getChildren().add(bookTable1);
+        bookTable1.prefWidthProperty().bind(tablePane.widthProperty());
+        bookTable1.prefHeightProperty().bind(tablePane.heightProperty());
     }
 
     //file Explorer
@@ -242,7 +239,7 @@ public class FXMLController {
                 new FileChooser.ExtensionFilter("All Supported File Types", "*.xml", "*.csv", "*.bin"),
                 new FileChooser.ExtensionFilter("xml files","*.xml"),
                 new FileChooser.ExtensionFilter("csv files","*.csv"),
-                new FileChooser.ExtensionFilter("bin files","*.bin")
+                new FileChooser.ExtensionFilter("bin files","*.ser")
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
@@ -327,7 +324,7 @@ public class FXMLController {
                 }
             }
 
-            File uniqueItemsFile = new File(currentFile.getName()+"AND"+file.getName()+defaultFileFormat);
+            File uniqueItemsFile = new File(currentFile.getName().split("\\.")[0]+"AND"+file.getName().split("\\.")[0]+defaultFileFormat);
             librarySaves.put(uniqueItemsFile, uniqueItemsLib);
             setCurrentLibrary(uniqueItemsFile, uniqueItemsLib);
             label.setText("Libraries compared created new file in: " + uniqueItemsFile.getAbsolutePath());
@@ -345,7 +342,6 @@ public class FXMLController {
     //blank file
     @FXML
     private void makeBlankLibrary(){
-        nodeTurnOn(tablePane);
         File file = new File("Untitled"+defaultFileFormat);
         int i = 0;
         while(file.exists() || librarySaves.get(file) != null){
@@ -361,7 +357,6 @@ public class FXMLController {
         try{
             File file = Objects.requireNonNull(selectFile());
             librarySaves.put(file, Objects.requireNonNull(setCurrentLibrary(file)));
-            nodeTurnOn(tablePane);
         }
         catch(IllegalArgumentException e){
             label.setText(e.getMessage());
@@ -372,7 +367,7 @@ public class FXMLController {
     }
 
     @FXML
-    private void addABookToTable(){
+    private void addBookToTable(){
         try{
             Book book = Objects.requireNonNull(bookForm("Adding book to library"));
             ObservableList<Book> currentLib = librarySaves.get(currentFile);
@@ -442,10 +437,10 @@ public class FXMLController {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save to file");
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("All Supported File Types", "*.xml", "*.csv", "*.bin"),
+                    new FileChooser.ExtensionFilter("All Supported File Types", "*.xml", "*.csv", "*.ser"),
                     new FileChooser.ExtensionFilter("XML files", "*.xml"),
                     new FileChooser.ExtensionFilter("CSV files", "*.csv"),
-                    new FileChooser.ExtensionFilter("Binary files", "*.bin"));
+                    new FileChooser.ExtensionFilter("Binary files", "*.ser"));
             fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
             File file = fileChooser.showSaveDialog(saveToFileStage);
             saveFile(librarySaves.get(currentFile), file);

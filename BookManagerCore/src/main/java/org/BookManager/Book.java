@@ -190,7 +190,7 @@ public class Book implements Serializable, Comparable<Book> {
         if (listOfBooks == null || listOfBooks.isEmpty()){
             throw new IllegalArgumentException("Nothing given to serialize");
         }
-        else if(!testFileForSerialization(file,".bin")){
+        else if(!testFileForSerialization(file,".ser")){
             throw new IllegalArgumentException("File unable to be serialized to");
         }
 
@@ -271,7 +271,7 @@ public class Book implements Serializable, Comparable<Book> {
     }
 
     public static TreeSet<Book> deserializeFromBinary(File file) throws IllegalArgumentException {
-        if (!testFileForDeserialization(file,".bin")){
+        if (!testFileForDeserialization(file,".ser")){
             throw new IllegalArgumentException("File given is unable to deserialize");
         }
         TreeSet<Book> treeSetOfBooks = new TreeSet<>();
