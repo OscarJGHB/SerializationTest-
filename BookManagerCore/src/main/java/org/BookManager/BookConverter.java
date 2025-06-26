@@ -32,6 +32,10 @@ public class BookConverter implements Converter {
         writer.setValue(String.valueOf(book.getYear()));
         writer.endNode();
 
+        writer.startNode("thumbnail");
+        writer.setValue(book.getBookCoverFile());
+        writer.endNode();
+
         writer.startNode("pictures");
         writer.setValue(book.getPictures() ? "yes" : "no");
         writer.endNode();
@@ -52,6 +56,10 @@ public class BookConverter implements Converter {
 
         reader.moveDown();
         book.setYear(Integer.parseInt(reader.getValue()));
+        reader.moveUp();
+
+        reader.moveDown();
+        book.setBookCoverFile(reader.getValue());
         reader.moveUp();
 
         reader.moveDown();

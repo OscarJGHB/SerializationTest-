@@ -49,6 +49,7 @@ public class BookTest {
         File file = makeNewFile("books.csv");
         Book mb0 = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         Book mb1 = new Book("How to Train Your Dragon","Dreamworks","Action",2011,true);
+        mb0.setBookCoverFile("/example_images/Hp.png");
         ArrayList<Book> correctBooks = new ArrayList<>(Set.of(mb0, mb1));
         Book.serializeToCSV(correctBooks, file);
         List<String> csvEntries;
@@ -73,12 +74,13 @@ public class BookTest {
         File file = makeNewFile("books.csv");
         Book mb0 = new Book("To Kill a MockingBird", "Harper Lee", "Thriller",1960,true);
         Book mb1 = new Book("How to Train Your Dragon","Dreamworks","Action",2011,true);
+        mb0.setBookCoverFile("/example_images/Hp.png");
         TreeSet<Book> correctBooks = new TreeSet<>(Set.of(mb0, mb1));
         Book.serializeToCSV(correctBooks, file);
 
         TreeSet<Book> mbCpy = Book.deserializeFromCSV(file);
         assertTrue(mbCpy.equals(correctBooks));
-        file.delete();
+//        file.delete();
     }
 
     //nothing should be added to file
@@ -169,7 +171,7 @@ public class BookTest {
 
         //invalid year
         try(FileWriter fw = new FileWriter(exampleCSV)){
-            fw.write("title,author,genre,year"+"\n");
+            fw.write(Book.getCSVHeader() + "\n");
             fw.write("Jane Austen,Romance Novel,1891,Pride and Prejudice"+"\n");
             fw.flush();
             assertEquals(0,Book.deserializeFromCSV(exampleCSV).size());
@@ -181,7 +183,7 @@ public class BookTest {
         //not enough
         try(FileWriter fw = new FileWriter(exampleCSV)){
             //erase file and restart
-            fw.write("title,author,genre,year"+"\n");
+            fw.write(Book.getCSVHeader() + "\n");
             fw.write("Pride and Prejudice, Jane Austen, Romance Novel"+"\n");
             fw.flush();
             assertEquals(0,Book.deserializeFromCSV(exampleCSV).size());
@@ -193,7 +195,7 @@ public class BookTest {
         //no data found
         try(FileWriter fw = new FileWriter(exampleCSV)){
             //erase file and restart
-            fw.write("title,author,genre,year"+"\n");
+            fw.write(Book.getCSVHeader()+"\n");
             fw.flush();
             assertEquals(0,Book.deserializeFromCSV(exampleCSV).size());
         }
@@ -214,6 +216,7 @@ public class BookTest {
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);
         Book book4 = new Book("A","R","F",4,true);
+        book1.setBookCoverFile("/example_images/Hp.png");
 
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
         TreeSet<Book> booksFromXML;
@@ -240,6 +243,7 @@ public class BookTest {
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);
         Book book4 = new Book("A","R","F",4,true);
+        book1.setBookCoverFile("/example_images/Hp.png");
 
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
 
@@ -297,6 +301,7 @@ public class BookTest {
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);
         Book book4 = new Book("A","R","F",4,true);
+        book1.setBookCoverFile("/example_images/Hp.png");
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
         TreeSet<Book> booksFromBinary = new TreeSet<>();
 
@@ -319,6 +324,7 @@ public class BookTest {
         Book book2 = new Book("a","b","c",4,true);
         Book book3 = new Book("T","O","M",4,true);
         Book book4 = new Book("A","R","F",4,true);
+        book1.setBookCoverFile("/example_images/Hp.png");
         Collection<Book> books = new TreeSet<>(Set.of(book1,book2,book3,book4));
         TreeSet<Book> booksFromBinary = new TreeSet<>();
 

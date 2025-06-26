@@ -11,12 +11,15 @@ import java.util.*;
 @XStreamAlias("Book")
 public class Book implements Serializable, Comparable<Book> {
 
+    //TODO String pathname for book cover
     private String title = "";
     private String author = "";
     private String genre = "";
+    private String bookCoverFile = "";
     private int year = -1;
     private boolean pictures = false;
-    private static final String csvHeader = "title,author,genre,year";
+
+    private static final String csvHeader = "title,author,genre,year,pictures,bookCoverFile";
     private static final XStream xstream = setUpXstream();
 
     public Book(){};
@@ -26,6 +29,10 @@ public class Book implements Serializable, Comparable<Book> {
         setGenre(genre);
         setYear(year);
         setPictures(pictures);
+    }
+    public Book(String title, String author, String genre, int year, boolean pictures, String bookCoverFile) {
+        this(title, author, genre, year, pictures);
+        setBookCoverFile(bookCoverFile);
     }
 
     //GETTERS
@@ -44,6 +51,7 @@ public class Book implements Serializable, Comparable<Book> {
     public boolean getPictures() {
         return pictures;
     }
+    public String getBookCoverFile() {return bookCoverFile;}
 
     //SETTERS
     public void setTitle(String title) {
@@ -57,6 +65,7 @@ public class Book implements Serializable, Comparable<Book> {
     public void setPictures(boolean pictures) {
         this.pictures = pictures;
     }
+    public void setBookCoverFile(String bookCoverFile) {this.bookCoverFile = (bookCoverFile == null ? this.bookCoverFile : bookCoverFile).trim();}
 
     @Override
     public int compareTo(Book b){
@@ -77,17 +86,19 @@ public class Book implements Serializable, Comparable<Book> {
         return (book.author.equals(this.author)
                 && book.title.equals(this.title)
                 && book.genre.equals(this.genre)
-                && book.year == this.year);
+                && book.year == this.year
+                && book.pictures==this.pictures
+                && book.bookCoverFile.equals(this.bookCoverFile));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, title, genre, year);
+        return Objects.hash(author, title, genre, year, pictures, bookCoverFile);
     }
 
     @Override
     public String toString() {
-        return String.format("%s,%s,%s,%d,%b", title, author, genre, year, pictures);
+        return String.format("%s,%s,%s,%d,%b,%s", title, author, genre, year, pictures, bookCoverFile);
     }
 
     public static String getCSVHeader(){
@@ -176,7 +187,9 @@ public class Book implements Serializable, Comparable<Book> {
             fw.write(csvHeader + "\n");
             fw.flush();
             for(Book book : listOfBooks){
-                fw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getGenre() + "," + book.getYear() + "," + book.getPictures()+"\n");
+                fw.write(book.getTitle() + "," + book.getAuthor()
+                        + "," + book.getGenre() + "," + book.getYear()
+                        + "," + book.getPictures()+ "," + book.getBookCoverFile() + "\n");
             }
         }
         catch(IOException e) {
@@ -242,8 +255,8 @@ public class Book implements Serializable, Comparable<Book> {
             while(scnr.hasNextLine()) {
                 int lineNum = 0; //error printing purposes
                 String line = scnr.nextLine();
-                String[] bookStats = line.split(",");
-                if(bookStats.length == 5) {
+                String[] bookStats = line.split(",", -1);
+                if(bookStats.length == 6) {
                     int yearReleased;
                     try{
                         yearReleased = Integer.parseInt(bookStats[3]);
@@ -252,7 +265,7 @@ public class Book implements Serializable, Comparable<Book> {
                             case "false" -> false;
                             default -> throw new IllegalArgumentException();
                         };
-                        treeSetOfBooks.add(new Book(bookStats[0].trim(), bookStats[1].trim(), bookStats[2].trim(), yearReleased,pictures));
+                        treeSetOfBooks.add(new Book(bookStats[0].trim(), bookStats[1].trim(), bookStats[2].trim(), yearReleased,pictures,bookStats[5]));
                     }
                     catch(IllegalArgumentException e) {
                         //skipping
@@ -260,6 +273,7 @@ public class Book implements Serializable, Comparable<Book> {
                 }
                 else {
                     System.out.printf("Invalid Entry: %s @ ln %d Skipping...",line, lineNum);
+                    System.out.println("Actual length: " + bookStats.length);
                 }
             }
         }

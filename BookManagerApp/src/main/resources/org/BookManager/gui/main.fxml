@@ -67,7 +67,7 @@
             </AnchorPane>
             <TabPane fx:id="openLibrariesTabPane" styleClass="open_tabs_bar" AnchorPane.bottomAnchor="25" AnchorPane.leftAnchor="-5">
             </TabPane>
-              <ButtonBar layoutY="333.0" prefHeight="25.0" prefWidth="149.0">
+              <ButtonBar buttonMinWidth="30.0" layoutY="333.0" prefHeight="25.0" prefWidth="149.0" AnchorPane.bottomAnchor="0.0">
                 <buttons>
                            <Button fx:id="addBookButton" alignment="BASELINE_LEFT" onAction="#addBookToTable" prefHeight="25.0" prefWidth="246.0" text="Add Book" />
                            <Button fx:id="deleteBookButton" onAction="#removeABookFromTable" text="Delete Book" />

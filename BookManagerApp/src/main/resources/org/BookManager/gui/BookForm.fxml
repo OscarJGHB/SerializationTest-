@@ -3,35 +3,24 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.BookManager.gui.BookFormController"
-            prefHeight="180" prefWidth="420"
-            maxHeight="200" maxWidth="280"
-            minHeight="200" minWidth="280">
-    <VBox alignment="CENTER_RIGHT"
-        AnchorPane.leftAnchor="120"
-        >
-        <TextField fx:id="titleField"/>
-        <TextField fx:id="authorField"/>
-        <TextField fx:id="genreField"/>
-        <TextField fx:id="yearField"/>
-        <TextField fx:id="pictureField"/>
+<AnchorPane maxHeight="200" maxWidth="280" minHeight="200" minWidth="280" prefHeight="180" prefWidth="420" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.BookManager.gui.BookFormController">
+    <VBox alignment="CENTER_RIGHT" spacing="2.0" AnchorPane.leftAnchor="120" AnchorPane.topAnchor="1.0">
+        <TextField fx:id="titleField" />
+        <TextField fx:id="authorField" />
+        <TextField fx:id="genreField" />
+        <TextField fx:id="yearField" />
+        <TextField fx:id="pictureField" />
+        <Label fx:id="coverAdded" />
 
     </VBox>
-    <VBox alignment="BASELINE_LEFT"
-        AnchorPane.leftAnchor="5"
-        spacing="10">
-        <Label text="Title:"/>
-        <Label text="Author:"/>
-        <Label text="Genre:"/>
-        <Label text="Year:"/>
-        <Label text="Picture:"/>
-
-        <Button fx:id="submitButton" text = "Submit" onAction="#handleSubmitButtonAction"/>
+    <VBox alignment="BASELINE_LEFT" spacing="10.0" AnchorPane.leftAnchor="5">
+        <Label text="Title:" />
+        <Label text="Author:" />
+        <Label text="Genre:" />
+        <Label text="Year:" />
+        <Label text="Picture:" />
+       <Button fx:id="addPictureButton" text="Add Cover" onAction="#handleAddPictureButtonAction"/>
     </VBox>
-    <HBox alignment="BOTTOM_CENTER"
-    AnchorPane.bottomAnchor="0">
-        <Label fx:id="instruction"/>
-    </HBox>
+
+     <Button fx:id="submitButton" layoutX="5.0" layoutY="174.0" onAction="#handleSubmitButtonAction" text="Submit" />
 </AnchorPane>

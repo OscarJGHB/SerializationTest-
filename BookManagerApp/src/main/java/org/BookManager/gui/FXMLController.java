@@ -26,7 +26,7 @@ import java.util.Objects;
 
 public class FXMLController {
 
-    //TODO move more over to FXML
+    //TODO edit in real time without form
     private ObservableMap<File,ObservableList<Book>> librarySaves = FXCollections.observableHashMap();
     private String defaultFileFormat = ".xml";
     private File currentFile;
@@ -259,7 +259,6 @@ public class FXMLController {
         }
 
         BookFormController controller = (BookFormController)loader.getController();
-        controller.setInstruction(instruction);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getClassLoader().getResource("org/BookManager/gui/styles.css").toExternalForm());
@@ -267,6 +266,7 @@ public class FXMLController {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(instruction);
         stage.showAndWait();
 
         return controller.getAcceptedBookObj();
