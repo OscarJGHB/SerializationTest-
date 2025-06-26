@@ -7,7 +7,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -30,6 +32,7 @@ public class FXMLController {
     private ObservableMap<File,ObservableList<Book>> librarySaves = FXCollections.observableHashMap();
     private String defaultFileFormat = ".xml";
     private File currentFile;
+    private String currentViewMode = "Table View";
 
     //Menu Page
     @FXML
@@ -63,6 +66,12 @@ public class FXMLController {
     @FXML
     private Menu toolsSubMenu1;
     @FXML
+    private Menu viewMenu;
+    @FXML
+    private MenuItem viewMenuItem0;
+    @FXML
+    private MenuItem viewMenuItem1;
+    @FXML
     private Label label;
     @FXML
     private Label instructionLabel;
@@ -82,6 +91,8 @@ public class FXMLController {
     @FXML
     private AnchorPane tablePane;
     @FXML
+    private FlowPane bookCoverLayout;
+    @FXML
     private Button addBookButton;
     @FXML
     private Button deleteBookButton;
@@ -91,7 +102,7 @@ public class FXMLController {
     private BookTableClass bookTable1 = new BookTableClass();
 
 
-
+    //TODO add listeners to menuItems if necessary and put in diff function
     public void initialize() {
         label.setText(MainApp.appName);
         defaultSerializationLabel.setText("New libraries set to: " + defaultFileFormat);
@@ -168,10 +179,39 @@ public class FXMLController {
         defaultSerializationLabel.setText("Currently serializing to " + defaultFileFormat);
     }
 
+    private void setCurrentViewMode(String currentViewMode) {
+        this.currentViewMode = currentViewMode;
+        if(!librarySaves.isEmpty()){
+            setView(librarySaves.get(currentFile));
+        }
+    }
+
+    private void setView(ObservableList<Book> books) {
+
+        if(books == null){
+            return;
+        }
+
+        if(currentViewMode.equals("Table View")){
+            nodeTurnOff(bookCoverLayout);
+            nodeTurnOn(bookTable1);
+            bookTable1.setItems(books);
+        }
+        else if(currentViewMode.equals("Cover View")){
+            nodeTurnOff(bookTable1);
+            nodeTurnOn(bookCoverLayout);
+            bookCoverLayout.getChildren().clear();
+            books.forEach(book -> {
+                BookCoverClass bookCover = BookCoverClass.generateBookCover(new Rectangle(60,80),book);
+                bookCover.repaint();
+                bookCoverLayout.getChildren().add(bookCover);
+            });
+        }
+    }
 
     //sets current library and uses in memory list
     private void setCurrentLibrary(File file , ObservableList<Book> library){
-        bookTable1.setItems(library);
+        setView(library);
         setStageName(MainApp.appName +" "+ file.getName());
         this.currentFile = file;
     }
@@ -201,7 +241,7 @@ public class FXMLController {
                 return null;
             }
         }
-        bookTable1.setItems(books);
+        setView(books);
         setStageName(MainApp.appName +" "+ file.getName());
         this.currentFile = file;
 
@@ -337,6 +377,12 @@ public class FXMLController {
     private void setDefaultFileFormat(ActionEvent event){
         setDefaultFileFormat(((MenuItem)event.getSource()).getText());
         System.out.println("Default File Format: " + defaultFileFormat);
+    }
+
+    @FXML
+    private void setCurrentViewMode(ActionEvent event){
+        setCurrentViewMode(((MenuItem)event.getSource()).getText());
+        System.out.println("Current View Mode: " + currentViewMode);
     }
 
     //blank file

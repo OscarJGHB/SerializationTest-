@@ -12,12 +12,16 @@ public class Main {
         File fileXML = new File("Library.xml");
 //
 //        File fileCSV = new File("Library.csv");
-        File fileBIN = new File("Library.bin");
+        File fileBIN = new File("Library.ser");
 ////
         Book tkamb = new Book("TKAMB","DOUG","FUNNY",2022,false);
         Book tkamb2 = new Book("Te","D","Romance",2022,false);
         Book invisible = new Book("Invisible","Rob","Novel",2013,true);
         Book invisible2 = new Book("Invisible2","Rob","Novel",2013,true);
+        tkamb.setBookCoverFile("BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png");
+        tkamb2.setBookCoverFile("BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png");
+        invisible.setBookCoverFile("BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png");
+
 
         ArrayList<Book> books = new ArrayList<>(Set.of(tkamb2,tkamb,invisible,invisible2));
         try {

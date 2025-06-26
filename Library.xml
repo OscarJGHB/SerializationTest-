@@ -1,32 +1,37 @@
 <Library>
-  <Book title="TKAMB2">
-    <author>Oscar Jiang</author>
-    <genre>Novel</genre>
-    <released>1998</released>
+  <Book title="TKAMB">
+    <author>DOUG</author>
+    <genre>FUNNY</genre>
+    <released>2022</released>
+    <thumbnail>BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png</thumbnail>
     <pictures>no</pictures>
   </Book>
   <Book title="Invisible2">
     <author>Rob</author>
     <genre>Novel</genre>
     <released>2013</released>
+    <thumbnail>BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png</thumbnail>
     <pictures>yes</pictures>
-  </Book>
-  <Book title="TKAMB">
-    <author>DOUG</author>
-    <genre>FUNNY</genre>
-    <released>2022</released>
-    <pictures>no</pictures>
   </Book>
   <Book title="Te">
     <author>D</author>
     <genre>Romance</genre>
     <released>2022</released>
+    <thumbnail>BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png</thumbnail>
     <pictures>no</pictures>
   </Book>
   <Book title="Invisible">
     <author>Rob</author>
     <genre>Novel</genre>
     <released>2013</released>
+    <thumbnail>BookManagerCore/src/test/resources/org/BookManager/example_images/Hp.png</thumbnail>
     <pictures>yes</pictures>
+  </Book>
+  <Book title="ons">
+    <author></author>
+    <genre></genre>
+    <released>-1</released>
+    <thumbnail></thumbnail>
+    <pictures>no</pictures>
   </Book>
 </Library>

@@ -16,7 +16,9 @@
     -fx-font: 16px "Arial";
 }
 
-
+.main_app_background{
+    -fx-background-color:#b0b0ff;
+}
 .main_menu-bar{
     -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #b0b0ff);
     -fx-font-size: 12px;
@@ -38,4 +40,5 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
+
 
